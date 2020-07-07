@@ -1,0 +1,131 @@
+#!/usr/bin/env python3
+
+import gym
+# !pip3 install box2d
+import random
+import torch
+import numpy as np
+from collections import deque
+import matplotlib.pyplot as plt
+# %matplotlib inline
+
+# !python -m pip install pyvirtualdisplay
+from pyvirtualdisplay import Display
+
+from config.config import get_config
+from dqn.environment import Environment
+from dqn.play import Play
+
+display = Display(visible=0, size=(1400, 900))
+display.start()
+
+is_ipython = 'inline' in plt.get_backend()
+if is_ipython:
+    from IPython import display
+
+from IPython import display
+
+plt.ion()
+
+import argparse
+import logging
+import logging.config
+import os
+import sys
+
+
+def init_logging(level):
+    root = logging.getLogger()
+    root.setLevel(level)
+
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setLevel(level)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+    root.addHandler(handler)
+
+
+def set_logging_level(level):
+    logger = logging.getLogger()
+    logger.setLevel(level)
+    for handler in logger.handlers:
+        handler.setLevel(level)
+
+
+def transform_verbose_count_to_logging_level(count):
+    return max(3 - count, 0) * 10
+
+
+def parse_arguments(params):
+    ap = argparse.ArgumentParser(description="Runs data prep",
+                                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    ap.add_argument("-v", "--verbose", dest="verbose_count",
+                    action="count", default=0,
+                    help="Increases log verbosity for each occurrence.")
+    ap.add_argument('-t', '--train',
+                    action='store_true',
+                    help="Train")
+    ap.add_argument('-p', '--play',
+                    action='store_true',
+                    help="play")
+    ap.add_argument('-e', '--env',
+                    default='cartpole',
+                    help="Environment")
+    ap.add_argument('-l', '--list_envs',
+                    action='store_true',
+                    help="List RL environment")
+
+    args = ap.parse_args()
+
+    return args
+
+
+def main():
+    init_logging(logging.ERROR)
+
+    params = {
+        "path_home": os.getenv("HOME"),
+        "path_models": "models",
+    }
+
+    try:
+        args = parse_arguments(params)
+
+        set_logging_level(transform_verbose_count_to_logging_level(args.verbose_count))
+
+        logging.debug(params)
+
+        config = get_config()
+        environment = Environment(config)
+        environment.set_env(args.env)
+        agent = environment.get_agent()
+        env = environment.get_env()
+
+        if args.list_envs:
+            for e in list(config.keys()):
+                print(e)
+            env.close()
+            return
+
+        if args.train:
+            print('train')
+            from dqn.train import dqn
+            scores = dqn(agent, env)
+            env.close()
+            return
+
+        if args.play:
+            play = Play(env=env, agent=agent)
+            play.play()
+            env.close()
+            return
+
+    except Exception as e:
+        logging.exception("Something went wrong :-(")
+
+    finally:
+        logging.shutdown()
+
+
+if __name__ == '__main__':
+    main()
