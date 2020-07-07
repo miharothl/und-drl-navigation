@@ -21,7 +21,7 @@ from IPython import display
 plt.ion()
 
 
-env = gym.make('LunarLander-v2')
+#env = gym.make('LunarLander-v2')
 # env = gym.make('CarRacing-v0')
 # env = gym.make('BipedalWalker-v3')
 env = gym.make('CartPole-v1')
@@ -37,20 +37,20 @@ agent = Agent(state_size=8, action_size=4, seed=0)
 # agent = Agent(state_size=24, action_size=4, seed=0)
 agent = Agent(state_size=4, action_size=2, seed=0)
 
-# watch an untrained agent
-state = env.reset()
-img = plt.imshow(env.render(mode='rgb_array'))
-for j in range(200):
-    action = agent.act(state)
-    img.set_data(env.render(mode='rgb_array'))
-    plt.axis('off')
-    display.display(plt.gcf())
-    display.clear_output(wait=True)
-    state, reward, done, _ = env.step(action)
-    if done:
-        break
-
-env.close()
+## watch an untrained agent
+#state = env.reset()
+#img = plt.imshow(env.render(mode='rgb_array'))
+#for j in range(200):
+#    action = agent.act(state)
+#    img.set_data(env.render(mode='rgb_array'))
+#    plt.axis('off')
+#    display.display(plt.gcf())
+#    display.clear_output(wait=True)
+#    state, reward, done, _ = env.step(action)
+#    if done:
+#        break
+#
+#env.close()
 
 
 #
