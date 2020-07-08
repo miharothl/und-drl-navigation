@@ -14,6 +14,9 @@ class Environment:
     def set_env(self, env):
         self.__env = env
 
+    def get_model_id(self):
+        return self.__config[self.__env]['id']
+
     def get_agent(self):
         action_size = self.__config[self.__env]['agent']['action_size']
         state_size = self.__config[self.__env]['agent']['state_size']
@@ -43,3 +46,9 @@ class Environment:
         logging.debug("Env observation space: {}".format(env.observation_space))
 
         return env
+
+
+    def list_envs(self):
+        for e in list(self.__config.keys()):
+            print(e)
+

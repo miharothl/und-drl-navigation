@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 # !python -m pip install pyvirtualdisplay
 from pyvirtualdisplay import Display
 
-from config.config import get_config
+from config.config import get_env_config, get_app_config
 from dqn.environment import Environment
 from dqn.play import Play
 
@@ -30,8 +30,8 @@ plt.ion()
 import argparse
 import logging
 import logging.config
-import os
 import sys
+from dqn.train import Train
 
 
 def init_logging(level):
@@ -74,6 +74,10 @@ def parse_arguments(params):
     ap.add_argument('-l', '--list_envs',
                     action='store_true',
                     help="List RL environment")
+    ap.add_argument("-m", '--select_model',
+                    default='score_max',
+                    choices=['score_max', 'score_min', 'score_median'],
+                    help="Model selection criteria")
 
     args = ap.parse_args()
 
@@ -83,10 +87,7 @@ def parse_arguments(params):
 def main():
     init_logging(logging.ERROR)
 
-    params = {
-        "path_home": os.getenv("HOME"),
-        "path_models": "models",
-    }
+    params = get_app_config()
 
     try:
         args = parse_arguments(params)
@@ -95,30 +96,29 @@ def main():
 
         logging.debug(params)
 
-        config = get_config()
+        config = get_env_config()
         environment = Environment(config)
         environment.set_env(args.env)
         agent = environment.get_agent()
         env = environment.get_env()
 
         if args.list_envs:
-            for e in list(config.keys()):
-                print(e)
+            environment.list_envs()
+        elif args.train:
+            train = Train(model_id=environment.get_model_id())
+            train.dqn(agent, env)
+        elif args.play:
+            play = Play(model_id=environment.get_model_id(),
+                        env=env,
+                        agent=agent)
+            if args.select_model == 'score_max':
+                play.play()
+            elif args.select_model == 'score_median':
+                play.play(score_max=False, score_med=True)
+            else:
+                play.play(score_max=False, score_med=False)
+        else:
             env.close()
-            return
-
-        if args.train:
-            print('train')
-            from dqn.train import dqn
-            scores = dqn(agent, env)
-            env.close()
-            return
-
-        if args.play:
-            play = Play(env=env, agent=agent)
-            play.play()
-            env.close()
-            return
 
     except Exception as e:
         logging.exception("Something went wrong :-(")

@@ -1,5 +1,5 @@
-def get_config():
-    config_template = {
+def get_env_config():
+    config = {
         'lunarlander':
             {
                 'id': 'LunarLander-v2',
@@ -28,4 +28,12 @@ def get_config():
             },
     }
 
-    return config_template
+    return config
+
+
+def get_app_config():
+    config = {
+        'path_models': 'models'
+    }
+
+    return config
