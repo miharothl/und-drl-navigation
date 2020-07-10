@@ -83,7 +83,7 @@ class Train:
 
 
 
-    def dqn_banana(self, agent, env, n_episodes=3000, max_t=1000, eps_start=1.0, eps_end=0.01, eps_decay=0.997, terminate_soore=300.0):
+    def dqn_banana(self, agent, env, n_episodes=3000, max_t=1000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, terminate_soore=300.0):
         """Deep Q-Learning.
 
         Params
@@ -122,28 +122,27 @@ class Train:
         eps = eps_start                    # initialize epsilon
         for i_episode in range(1, n_episodes+1):
 
-
             # reset the environment
             env_info = env.reset(train_mode=True)[brain_name]
             state = env_info.vector_observations[0]            # get the current state
-
-            # state = env.reset()
             score = 0
+
             for t in range(max_t):
 
                 action = agent.act(state, eps)
 
                 env_info = env.step(action)[brain_name]        # send the action to the environment
+
                 next_state = env_info.vector_observations[0]   # get the next state
                 reward = env_info.rewards[0]                   # get the reward
                 done = env_info.local_done[0]                  # see if episode has finished
-                # next_state, reward, done, _ = env.step(action)
-                # agent.step(state, action, reward, next_state, done)
 
+                agent.step(state, action, reward, next_state, done)
 
                 state = next_state
                 score += reward
                 if done:
+                    print('done')
                     break
             scores_window.append(score)       # save most recent score
             scores.append(score)              # save most recent score

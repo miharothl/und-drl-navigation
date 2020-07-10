@@ -99,6 +99,7 @@ def main():
                 score += reward  # update the score
                 state = next_state  # roll over the state to next time step
                 if done:  # exit loop if episode finished
+                    print('done')
                     break
 
             print("Score: {}".format(score))
