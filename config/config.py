@@ -26,13 +26,26 @@ def get_env_config():
                     {
                     }
             },
-         'banana':
+        'banana':
             {
                 'id': 'banana',
                 'agent':
                     {
                         'action_size': 4,
                         'state_size': 37,
+                        'discrete': True
+                    },
+                'train':
+                    {
+                    }
+            },
+         'spaceinvaders':
+            {
+                'id': 'SpaceInvaders-ram-v0',
+                'agent':
+                    {
+                        'action_size': 6,
+                        'state_size': 128,
                         'discrete': True
                     },
                 'train':

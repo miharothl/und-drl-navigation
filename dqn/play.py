@@ -11,18 +11,18 @@ class Play:
         self.__model_id = model_id
         self.__path_models = path_models
 
-    def play(self, score_max=True, score_med=False):
+    def play(self, score_max=True, score_med=False, trained=True, mode='rgb_array'):
 
-        filename = self.select_model_filename(score_max, score_med)
-
-        self.__agent.qnetwork_local.load_state_dict(torch.load(filename))
+        if trained:
+            filename = self.select_model_filename(score_max, score_med)
+            self.__agent.qnetwork_local.load_state_dict(torch.load(filename))
 
         for i in range(3):
             state = self.__env.reset()
-            self.__env.render(mode='rgb_array')
+            self.__env.render(mode=mode)
             for j in range(200):
                 action = self.__agent.act(state)
-                self.__env.render(mode='rgb_array')
+                self.__env.render(mode=mode)
                 state, reward, done, _ = self.__env.step(action)
                 if done:
                     break
@@ -59,6 +59,49 @@ class Play:
                     break
 
         # display.stop()
+
+    def play_banana(self, score_max=True, score_med=False):
+
+        filename = self.select_model_filename(score_max, score_med)
+
+        self.__agent.qnetwork_local.load_state_dict(torch.load(filename))
+
+
+        brain_name = self.__env.brain_names[0]
+        brain = self.__env.brains[brain_name]
+
+        # reset the environment
+        env_info = self.__env.reset(train_mode=True)[brain_name]
+
+        # number of agents in the environment
+        print('Number of agents:', len(env_info.agents))
+
+        # number of actions
+        action_size = brain.vector_action_space_size
+        print('Number of actions:', action_size)
+
+        # examine the state space
+        state = env_info.vector_observations[0]
+        print('States look like:', state)
+        state_size = len(state)
+        print('States have length:', state_size)
+
+        env_info = self.__env.reset(train_mode=False)[brain_name]  # reset the environment
+        state = env_info.vector_observations[0]  # get the current state
+        score = 0  # initialize the score
+        while True:
+            action = self.__agent.act(state)
+            env_info = self.__env.step(action)[brain_name]  # send the action to the environment
+            next_state = env_info.vector_observations[0]  # get the next state
+            reward = env_info.rewards[0]  # get the reward
+            done = env_info.local_done[0]  # see if episode has finished
+            score += reward  # update the score
+            state = next_state  # roll over the state to next time step
+            if done:  # exit loop if episode finished
+                print('done')
+                break
+
+        print("Score: {}".format(score))
 
     def select_model_filename(self, score_max=True, score_med=False):
         import re

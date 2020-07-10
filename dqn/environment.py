@@ -36,7 +36,8 @@ class Environment:
         logging.debug('Environment: {}'.format(environment))
 
         if environment == 'banana':
-            env = UnityEnvironment(file_name="Banana_Linux_NoVis/Banana.x86_64")
+            env = UnityEnvironment(file_name="Banana.app")
+            # env = UnityEnvironment(file_name="Banana_Linux_NoVis/Banana.x86_64")
             return env
         else:
             env = gym.make(environment)
