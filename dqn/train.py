@@ -27,6 +27,7 @@ class Train:
         plt.ylabel('Score')
         plt.xlabel('Episode #')
         plt.show()
+        plt.close()
 
     def get_timestamp(self):
         # return datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
@@ -74,12 +75,15 @@ class Train:
             print('\rEpisode {}\tAverage Score: {:.2f}\tEpsilon: {:.2f}'.format(i_episode, np.mean(scores_window), eps), end="")
             if i_episode % 100 == 0:
                 print('\rEpisode {}\tAverage Score: {:.2f}\tEpsilon: {:.2f}'.format(i_episode, np.mean(scores_window), eps))
-                self.plot(scores)
                 torch.save(agent.qnetwork_local.state_dict(), model_filename)
+
+            if i_episode % 500 == 0:
+                self.plot(scores)
 
             if np.mean(scores_window)>=terminate_soore:
                 print('\nEpisode {}\tAverage Score: {:.2f}\tEpsilon: {:.2f}'.format(i_episode-100, np.mean(scores_window), eps))
                 torch.save(agent.qnetwork_local.state_dict(), model_filename)
+                self.plot(scores)
                 break
 
         return scores

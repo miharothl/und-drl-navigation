@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import argparse
 
 import gym
 # !pip3 install box2d
@@ -13,8 +14,13 @@ import matplotlib.pyplot as plt
 from pyvirtualdisplay import Display
 
 from config.config import get_env_config, get_app_config
+from dqn import logging
 from dqn.environment import Environment
+from dqn.logging import init_logging, set_logging_level, transform_verbose_count_to_logging_level
+import logging
+import logging.config
 from dqn.play import Play
+from dqn.train import Train
 
 display = Display(visible=0, size=(1400, 900))
 display.start()
@@ -26,34 +32,6 @@ if is_ipython:
 from IPython import display
 
 plt.ion()
-
-import argparse
-import logging
-import logging.config
-import sys
-from dqn.train import Train
-
-
-def init_logging(level):
-    root = logging.getLogger()
-    root.setLevel(level)
-
-    handler = logging.StreamHandler(sys.stdout)
-    handler.setLevel(level)
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    handler.setFormatter(formatter)
-    root.addHandler(handler)
-
-
-def set_logging_level(level):
-    logger = logging.getLogger()
-    logger.setLevel(level)
-    for handler in logger.handlers:
-        handler.setLevel(level)
-
-
-def transform_verbose_count_to_logging_level(count):
-    return max(3 - count, 0) * 10
 
 
 def parse_arguments(params):
