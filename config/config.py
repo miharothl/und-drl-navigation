@@ -26,6 +26,19 @@ def get_env_config():
                     {
                     }
             },
+         'banana':
+            {
+                'id': 'banana',
+                'agent':
+                    {
+                        'action_size': 4,
+                        'state_size': 37,
+                        'discrete': True
+                    },
+                'train':
+                    {
+                    }
+            },
     }
 
     return config

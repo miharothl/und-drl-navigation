@@ -3,6 +3,8 @@ import logging
 
 from gym.spaces import Discrete
 
+from unityagents import UnityEnvironment
+
 from dqn.dqn_agent import Agent
 
 
@@ -29,26 +31,28 @@ class Environment:
 
     def get_env(self):
 
-        environment =  self.__config[self.__env]['id']
+        environment = self.__config[self.__env]['id']
 
         logging.debug('Environment: {}'.format(environment))
 
-        env = gym.make(environment)
-        env.seed(0)
+        if environment == 'banana':
+            env = UnityEnvironment(file_name="Banana.app")
+            return env
+        else:
+            env = gym.make(environment)
+            env.seed(0)
 
-        isDiscrete = isinstance(env.action_space, Discrete)
+            isDiscrete = isinstance(env.action_space, Discrete)
 
-        if isDiscrete:
-            num_action_space = env.action_space.n
-            logging.debug("Env action space is discrete")
-            logging.debug("Env action space: {}".format(num_action_space))
+            if isDiscrete:
+                num_action_space = env.action_space.n
+                logging.debug("Env action space is discrete")
+                logging.debug("Env action space: {}".format(num_action_space))
 
-        logging.debug("Env observation space: {}".format(env.observation_space))
+            logging.debug("Env observation space: {}".format(env.observation_space))
 
-        return env
-
+            return env
 
     def list_envs(self):
         for e in list(self.__config.keys()):
             print(e)
-

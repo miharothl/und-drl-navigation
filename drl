@@ -1,18 +1,6 @@
 #!/usr/bin/env python3
 import argparse
 
-import gym
-# !pip3 install box2d
-import random
-import torch
-import numpy as np
-from collections import deque
-import matplotlib.pyplot as plt
-# %matplotlib inline
-
-# !python -m pip install pyvirtualdisplay
-from pyvirtualdisplay import Display
-
 from config.config import get_env_config, get_app_config
 from dqn import logging
 from dqn.environment import Environment
@@ -21,18 +9,7 @@ import logging
 import logging.config
 from dqn.play import Play
 from dqn.train import Train
-
-display = Display(visible=0, size=(1400, 900))
-display.start()
-
-is_ipython = 'inline' in plt.get_backend()
-if is_ipython:
-    from IPython import display
-
-from IPython import display
-
-plt.ion()
-
+import numpy as np
 
 def parse_arguments(params):
     ap = argparse.ArgumentParser(description="Runs data prep",
@@ -84,19 +61,65 @@ def main():
             environment.list_envs()
         elif args.train:
             train = Train(model_id=environment.get_model_id())
-            train.dqn(agent, env)
+
+            train.dqn_banana(agent, env)
+
+
+            # train.dqn(agent, env)
         elif args.play:
+
+            brain_name = env.brain_names[0]
+            brain = env.brains[brain_name]
+
+            # reset the environment
+            env_info = env.reset(train_mode=True)[brain_name]
+
+            # number of agents in the environment
+            print('Number of agents:', len(env_info.agents))
+
+            # number of actions
+            action_size = brain.vector_action_space_size
+            print('Number of actions:', action_size)
+
+            # examine the state space
+            state = env_info.vector_observations[0]
+            print('States look like:', state)
+            state_size = len(state)
+            print('States have length:', state_size)
+
+            env_info = env.reset(train_mode=False)[brain_name]  # reset the environment
+            state = env_info.vector_observations[0]  # get the current state
+            score = 0  # initialize the score
+            while True:
+                action = np.random.randint(action_size)  # select an action
+                env_info = env.step(action)[brain_name]  # send the action to the environment
+                next_state = env_info.vector_observations[0]  # get the next state
+                reward = env_info.rewards[0]  # get the reward
+                done = env_info.local_done[0]  # see if episode has finished
+                score += reward  # update the score
+                state = next_state  # roll over the state to next time step
+                if done:  # exit loop if episode finished
+                    break
+
+            print("Score: {}".format(score))
+
+
             play = Play(model_id=environment.get_model_id(),
                         env=env,
                         agent=agent)
             if args.select_model == 'score_max':
+                # play.play()
                 play.play()
+
+
+
+
             elif args.select_model == 'score_median':
                 play.play(score_max=False, score_med=True)
             else:
                 play.play(score_max=False, score_med=False)
-        else:
-            env.close()
+
+        env.close()
 
     except Exception as e:
         logging.exception("Something went wrong :-(")
