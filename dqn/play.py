@@ -13,16 +13,24 @@ class Play:
         self.__model_id = model_id
         self.__path_models = path_models
 
-    def play(self, score_max=True, score_med=False, trained=True, mode='rgb_array'):
 
-        if trained:
-            filename = self.select_model_filename(score_max, score_med)
-            self.__agent.qnetwork_local.load_state_dict(torch.load(filename))
+    def play(self, trained, mode, is_rgb, model_filename):
+
+        if is_rgb:
+            self.play_rgb(trained=trained, mode= mode, model_filename = model_filename)
+        else:
+            self.play_normal(trained=trained, mode= mode, model_filename = model_filename)
+
+
+    def play_normal(self, score_max=True, score_med=False, trained=True, mode='rgb_array', model_filename=None):
+
+        if trained or (model_filename is not None):
+            filename = self.select_model_filename(score_max, score_med, model_filename=model_filename)
+            self.__agent.qnetwork_local.load_state_dict(torch.load(filename, map_location=lambda storage, loc: storage))
 
         for i in range(3):
             state = self.__env.reset()
             self.__env.render(mode=mode)
-
 
             while True:
             # for j in range(5200):
@@ -37,9 +45,9 @@ class Play:
 
         if trained:
             filename = self.select_model_filename(score_max, score_med)
-            self.__agent.qnetwork_local.load_state_dict(torch.load(filename))
+            self.__agent.qnetwork_local.load_state_dict(torch.load(filename, map_location=lambda storage, loc: storage))
 
-        for i in range(3):
+        for i in range(10):
             state = self.__env.reset()
             image = self.__env.render(mode=mode)
 
@@ -129,7 +137,16 @@ class Play:
 
         print("Score: {}".format(score))
 
-    def select_model_filename(self, score_max=True, score_med=False):
+
+    def get_model_filename(self, model_filename):
+        path = os.path.join(self.__path_models, model_filename)
+        return path
+
+    def select_model_filename(self, score_max=True, score_med=False, model_filename=None):
+        if model_filename is not None:
+            path = os.path.join(self.__path_models, model_filename)
+            return path
+
         import re
         model_id = re.sub('[^0-9a-zA-Z.]+', '', self.__model_id)
         model_id = model_id.lower()

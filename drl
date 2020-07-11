@@ -20,6 +20,9 @@ def parse_arguments(params):
     ap.add_argument('-t', '--train',
                     action='store_true',
                     help="Train")
+    ap.add_argument('-f', '--model_filename',
+                    default=None,
+                    help="Model file")
     ap.add_argument('-p', '--play',
                     action='store_true',
                     help="play")
@@ -61,8 +64,10 @@ def main():
             environment.list_envs()
         elif args.train:
             train = Train(model_id=environment.get_model_id())
-            train.dqn_rgb(agent, env)
+            train.train(agent, env, environment.is_rgb(),
+                        model_filename = args.model_filename)
 
+            # train.dqn_rgb(agent, env)
             # train.dqn_banana(agent, env)
         elif args.play:
 
@@ -70,15 +75,17 @@ def main():
                         env=env,
                         agent=agent)
             if args.select_model == 'score_max':
-                play.play(mode='human')
-
-                # play.play_banana()
-            elif args.select_model == 'score_median':
-                play.play(score_max=False, score_med=True, mode='human')
-            elif args.select_model == 'score_median':
-                play.play(score_max=False, score_med=False, mode='human')
+                play.play(trained=True,
+                          mode='human',
+                          is_rgb=environment.is_rgb(),
+                          model_filename = args.model_filename)
+            #     # play.play_banana()
+            # elif args.select_model == 'score_median':
+            #     play.play(score_max=False, score_med=True, mode='human')
+            # elif args.select_model == 'score_median':
+            #     play.play(score_max=False, score_med=False, mode='human')
             else:
-                play.play_rgb(trained=False, mode='human')
+                play.play(trained=False, mode='human', is_rgb=environment.is_rgb())
                 # play.play(trained=False, mode='human')
 
         env.close()

@@ -29,14 +29,15 @@ class Environment:
         logging.debug("Agent state size: {}".format(state_size))
         logging.debug("Agent state RGB: {}".format(state_rgb))
 
-
-
         if state_rgb:
             agent = AgentRgb(state_size=state_size, action_size=action_size, seed=0)
         else:
             agent = Agent(state_size=state_size, action_size=action_size, seed=0)
 
         return agent
+
+    def is_rgb(self):
+        return self.__config[self.__env]['agent']['state_rgb']
 
     def get_env(self):
 
