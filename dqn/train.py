@@ -14,8 +14,8 @@ class Train:
 
     def plot(self, scores, filename):
         # plot the scores
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
+        # fig = plt.figure()
+        # ax = fig.add_subplot(111)
         plt.plot(np.arange(len(scores)), scores)
         plt.ylabel('Score')
         plt.xlabel('Episode #')
@@ -103,6 +103,9 @@ class Train:
                 plot_filename = self.get_plot_filename(i_episode, np.mean(scores_window), eps)
                 self.plot(scores, plot_filename)
 
+            if i_episode % 20 == 0:
+                agent.check_memory()
+
             if np.mean(scores_window) >= terminate_soore:
                 print('\nEpisode {}\tAverage Score: {:.2f}\tEpsilon: {:.2f}'.format(i_episode - 100,
                                                                                     np.mean(scores_window), eps))
@@ -152,6 +155,7 @@ class Train:
                 state = next_state
                 score += reward
                 if done:
+                    agent.check_memory()
                     break
             scores_window.append(score)  # save most recent score
             scores.append(score)  # save most recent score

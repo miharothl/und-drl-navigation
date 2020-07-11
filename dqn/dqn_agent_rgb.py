@@ -10,14 +10,15 @@ import torch.optim as optim
 
 from dqn.model_rgb import QNetwork2
 
-BUFFER_SIZE = int(5e5)  # replay buffer size
-BATCH_SIZE = 512  # minibatch size
+# BUFFER_SIZE = int(5e5)  # replay buffer size
+BUFFER_SIZE = int(1e5)  # replay buffer size
+BATCH_SIZE = 1024  # minibatch size
 # BATCH_SIZE = 128  # minibatch size
 GAMMA = 0.99  # discount factor
 TAU = 1e-3  # for soft update of target parameters
 LR = 5e-4  # learning rate
 # UPDATE_EVERY = 4  # how often to update the network
-UPDATE_EVERY = 10  # how often to update the network
+UPDATE_EVERY = 100  # how often to update the network
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -47,6 +48,22 @@ class AgentRgb:
         self.memory = ReplayBufferRGB(action_size, BUFFER_SIZE, BATCH_SIZE, seed)
         # Initialize time step (for updating every UPDATE_EVERY steps)
         self.t_step = 0
+
+    def check_memory(self):
+        total = BUFFER_SIZE
+        current = len(self.memory)
+
+        action_counter = [0 for i in range(self.action_size)]
+        for e in self.memory.memory:
+            action_counter[e.action] = action_counter[e.action] + 1
+
+        print("\n\ttotal: {} current: {}".format(total, current))
+
+        actions = "\t"
+        for i in range(self.action_size):
+            actions = actions + "action{}: {} \t".format(i, action_counter[i])
+
+        print(actions)
 
     def step(self, state, action, reward, next_state, done):
         # Save experience in replay memory

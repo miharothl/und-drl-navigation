@@ -46,6 +46,22 @@ class Agent:
         # Initialize time step (for updating every UPDATE_EVERY steps)
         self.t_step = 0
 
+    def check_memory(self):
+        total = BUFFER_SIZE
+        current = len(self.memory)
+
+        action_counter = [0 for i in range(self.action_size)]
+        for e in self.memory.memory:
+            action_counter[e.action] = action_counter[e.action] + 1
+
+        print("\n\ttotal: {} current: {}".format(total, current))
+
+        actions = "\t"
+        for i in range(self.action_size):
+            actions = actions + "action{}: {} \t".format(i, action_counter[i])
+
+        print(actions)
+
     def step(self, state, action, reward, next_state, done):
         # Save experience in replay memory
         self.memory.add(state, action, reward, next_state, done)
