@@ -3,6 +3,8 @@ import pandas as pd
 import torch
 import matplotlib.pyplot as plt
 
+from dqn.image import imshow
+
 
 class Play:
     def __init__(self, env, agent, model_id, path_models='models'):
@@ -20,8 +22,32 @@ class Play:
         for i in range(3):
             state = self.__env.reset()
             self.__env.render(mode=mode)
-            for j in range(200):
+
+
+            while True:
+            # for j in range(5200):
                 action = self.__agent.act(state)
+                self.__env.render(mode=mode)
+                state, reward, done, _ = self.__env.step(action)
+                if done:
+                    break
+        pass
+
+    def play_rgb(self, score_max=True, score_med=False, trained=True, mode='rgb_array'):
+
+        if trained:
+            filename = self.select_model_filename(score_max, score_med)
+            self.__agent.qnetwork_local.load_state_dict(torch.load(filename))
+
+        for i in range(3):
+            state = self.__env.reset()
+            image = self.__env.render(mode=mode)
+
+            image2 = imshow(state)
+
+            while True:
+                # for j in range(5200):
+                action = self.__agent.act(image2)
                 self.__env.render(mode=mode)
                 state, reward, done, _ = self.__env.step(action)
                 if done:

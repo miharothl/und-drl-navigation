@@ -3,9 +3,10 @@ import logging
 
 from gym.spaces import Discrete
 
-from unityagents import UnityEnvironment
+# from unityagents import UnityEnvironment
 
 from dqn.dqn_agent import Agent
+from dqn.dqn_agent_rgb import AgentRgb
 
 
 class Environment:
@@ -22,11 +23,19 @@ class Environment:
     def get_agent(self):
         action_size = self.__config[self.__env]['agent']['action_size']
         state_size = self.__config[self.__env]['agent']['state_size']
+        state_rgb = self.__config[self.__env]['agent']['state_rgb']
 
         logging.debug("Agent action size: {}".format(action_size))
         logging.debug("Agent state size: {}".format(state_size))
+        logging.debug("Agent state RGB: {}".format(state_rgb))
 
-        agent = Agent(state_size=state_size, action_size=action_size, seed=0)
+
+
+        if state_rgb:
+            agent = AgentRgb(state_size=state_size, action_size=action_size, seed=0)
+        else:
+            agent = Agent(state_size=state_size, action_size=action_size, seed=0)
+
         return agent
 
     def get_env(self):
@@ -36,9 +45,10 @@ class Environment:
         logging.debug('Environment: {}'.format(environment))
 
         if environment == 'banana':
-            env = UnityEnvironment(file_name="Banana.app")
+            # env = UnityEnvironment(file_name="Banana.app")
             # env = UnityEnvironment(file_name="Banana_Linux_NoVis/Banana.x86_64")
-            return env
+            # return env
+            return None
         else:
             env = gym.make(environment)
             env.seed(0)

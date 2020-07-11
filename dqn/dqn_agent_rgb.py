@@ -8,6 +8,8 @@ import torch
 import torch.nn.functional as F
 import torch.optim as optim
 
+from dqn.model_rgb import QNetwork2
+
 BUFFER_SIZE = int(5e5)  # replay buffer size
 BATCH_SIZE = 64  # minibatch size
 # BATCH_SIZE = 128  # minibatch size
@@ -20,7 +22,7 @@ UPDATE_EVERY = 10  # how often to update the network
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
-class Agent:
+class AgentRgb:
     """Interacts with and learns from the environment."""
 
     def __init__(self, state_size, action_size, seed):
@@ -37,17 +39,26 @@ class Agent:
         self.seed = random.seed(seed)
 
         # Q-Network
-        self.qnetwork_local = QNetwork(state_size, action_size, seed).to(device)
-        self.qnetwork_target = QNetwork(state_size, action_size, seed).to(device)
+        self.qnetwork_local = QNetwork2(state_size, state_size, action_size, seed).to(device)
+        self.qnetwork_target = QNetwork2(state_size, state_size, action_size, seed).to(device)
         self.optimizer = optim.Adam(self.qnetwork_local.parameters(), lr=LR)
 
         # Replay memory
-        self.memory = ReplayBuffer(action_size, BUFFER_SIZE, BATCH_SIZE, seed)
+        self.memory = ReplayBufferRGB(action_size, BUFFER_SIZE, BATCH_SIZE, seed)
         # Initialize time step (for updating every UPDATE_EVERY steps)
         self.t_step = 0
 
     def step(self, state, action, reward, next_state, done):
         # Save experience in replay memory
+
+        state = torch.from_numpy(state)
+        state = torch.unsqueeze(state, 0)
+        state = state.numpy()
+
+        next_state = torch.from_numpy(next_state)
+        next_state = torch.unsqueeze(next_state, 0)
+        next_state = next_state.numpy()
+
         self.memory.add(state, action, reward, next_state, done)
 
         # Learn every UPDATE_EVERY time steps.
@@ -120,7 +131,7 @@ class Agent:
             target_param.data.copy_(tau * local_param.data + (1.0 - tau) * target_param.data)
 
 
-class ReplayBuffer:
+class ReplayBufferRGB:
     """Fixed-size buffer to store experience tuples."""
 
     def __init__(self, action_size, buffer_size, batch_size, seed):

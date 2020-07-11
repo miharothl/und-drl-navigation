@@ -61,7 +61,7 @@ def main():
             environment.list_envs()
         elif args.train:
             train = Train(model_id=environment.get_model_id())
-            train.dqn(agent, env)
+            train.dqn_rgb(agent, env)
 
             # train.dqn_banana(agent, env)
         elif args.play:
@@ -70,16 +70,16 @@ def main():
                         env=env,
                         agent=agent)
             if args.select_model == 'score_max':
-                play.play()
+                play.play(mode='human')
 
                 # play.play_banana()
             elif args.select_model == 'score_median':
-                play.play(score_max=False, score_med=True)
+                play.play(score_max=False, score_med=True, mode='human')
             elif args.select_model == 'score_median':
-                play.play(score_max=False, score_med=False)
+                play.play(score_max=False, score_med=False, mode='human')
             else:
-                play.play(trained=False, mode='human')
-
+                play.play_rgb(trained=False, mode='human')
+                # play.play(trained=False, mode='human')
 
         env.close()
 
