@@ -116,7 +116,7 @@ class Trainer:
         return scores
 
     def dqn_rgb(self, agent, env, model_filename=None, n_episodes=10000, max_t=1000, eps_start=1.0, eps_end=0.03,
-                eps_decay=0.9995, terminate_soore=500.0):
+                eps_decay=0.995, terminate_soore=500.0):
         """Deep Q-Learning.
 
         Params
