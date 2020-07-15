@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 import argparse
 
-from config.config import get_app_config
-
 from drl import logging
 from drl.experiment.config import Config
 from drl.experiment.experiment import Experiment
