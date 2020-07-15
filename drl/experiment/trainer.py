@@ -40,7 +40,7 @@ class Trainer:
         filename = "{}_{}_{}_{:.2f}_{:.2f}.jpg".format(model_id, self.__timestamp, episode, score, eps)
         return os.path.join(self.__path_models, filename)
 
-    def train(self, agent, env, is_rgb, model_filename=None, num_episodes=2000):
+    def train(self, agent, env, is_rgb, model_filename=None, num_episodes=10000):
 
         if is_rgb:
             return self.dqn_rgb(agent, env, model_filename, n_episodes=num_episodes)
@@ -52,8 +52,8 @@ class Trainer:
             path = os.path.join(self.__path_models, model_filename)
             return path
 
-    def dqn_normal(self, agent, env, model_filename=None, n_episodes=3000, max_t=1000, eps_start=1.0, eps_end=0.01,
-                   eps_decay=0.997, terminate_soore=300.0):
+    def dqn_normal(self, agent, env, model_filename=None, n_episodes=10000, max_t=1000, eps_start=1.0, eps_end=0.01,
+                   eps_decay=0.995, terminate_soore=600.0):
         """Deep Q-Learning.
 
         Params

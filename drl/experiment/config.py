@@ -109,7 +109,7 @@ class Config:
                             'num_frames': 4,
                         },
                     'train': {
-                            'terminate_score': 600,
+                            'terminate_score': 1000,
                         }
                 },
             'spaceinvaders-rgb': {
@@ -122,7 +122,7 @@ class Config:
                             'num_frames': 4,
                         },
                     'train': {
-                            'terminate_score': 600,
+                            'terminate_score': 1000,
                         }
                 },
         }
