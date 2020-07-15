@@ -101,7 +101,7 @@ class Trainer:
 
             if i_episode % 100 == 0:
                 plot_filename = self.get_plot_filename(i_episode, np.mean(scores_window), eps)
-                self.plot(scores, plot_filename)
+                # self.plot(scores, plot_filename)
 
             if i_episode % 20 == 0:
                 agent.check_memory()
@@ -173,7 +173,7 @@ class Trainer:
 
             if i_episode % 100 == 0:
                 plot_filename = self.get_plot_filename(i_episode, np.mean(scores_window), eps)
-                self.plot(scores, plot_filename)
+                # self.plot(scores, plot_filename)
 
             if np.mean(scores_window) >= terminate_soore:
                 print('\nEpisode {}\tAverage Score: {:.2f}\tEpsilon: {:.2f}'.format(i_episode - 100,

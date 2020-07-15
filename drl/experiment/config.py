@@ -106,10 +106,10 @@ class Config:
                             'state_size': 128,
                             'discrete': True,
                             'state_rgb': False,
-                            'num_frames': 1,
+                            'num_frames': 4,
                         },
                     'train': {
-                            'terminate_score': 300,
+                            'terminate_score': 600,
                         }
                 },
             'spaceinvaders-rgb': {
@@ -119,7 +119,7 @@ class Config:
                             'state_size': 84,
                             'discrete': True,
                             'state_rgb': True,
-                            'num_frames': 1,
+                            'num_frames': 4,
                         },
                     'train': {
                             'terminate_score': 600,
