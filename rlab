@@ -60,7 +60,7 @@ def main():
         if args.list_envs:
             environment.list_envs()
         elif args.train:
-            environment.train(model=args.model_filename)
+            environment.train(model=args.model_filename, num_episodes=10000)
 
             # train.dqn_rgb(agent, env)
             # train.dqn_banana(agent, env)

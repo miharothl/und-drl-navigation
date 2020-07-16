@@ -2,7 +2,7 @@ import numpy as np
 import random
 from collections import namedtuple, deque
 
-from drl.models.classic.model import QNetwork
+from drl.models.classic.model import QNetwork, QNetworkB
 
 import torch
 import torch.nn.functional as F
@@ -37,8 +37,8 @@ class DqnAgent:
         self.seed = random.seed(seed)
 
         # Q-Network
-        self.qnetwork_local = QNetwork(state_size * num_frames, action_size, seed).to(device)
-        self.qnetwork_target = QNetwork(state_size * num_frames, action_size, seed).to(device)
+        self.qnetwork_local = QNetworkB(state_size * num_frames, action_size, seed).to(device)
+        self.qnetwork_target = QNetworkB(state_size * num_frames, action_size, seed).to(device)
         self.optimizer = optim.Adam(self.qnetwork_local.parameters(), lr=LR)
 
         # Replay memory

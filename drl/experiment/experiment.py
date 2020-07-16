@@ -42,7 +42,7 @@ class Experiment:
                   num_episodes=num_episodes,
                   num_steps=num_steps)
 
-    def train(self, model=None, num_episodes=2000):
+    def train(self, model=None, num_episodes=10000):
         trainer = Trainer(self.__config.get_current_model_id())
         return trainer.train(self.create_agent(),
                              self.create_env(),

@@ -33,6 +33,36 @@ class QNetwork2(nn.Module):
         return self.head(x.view(x.size(0), -1))
 #
 
+
+
+class QNetwork2a(nn.Module):
+
+    def __init__(self, h, w, channels, action_size, seed):
+        super(QNetwork2a, self).__init__()
+        self.seed = torch.manual_seed(seed)
+        self.conv1 = nn.Conv2d(channels, 32, kernel_size=8, stride=4)
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=6, stride=2)
+        self.conv3 = nn.Conv2d(64, 64, kernel_size=3, stride=1)
+
+        # fc1: 512 = 64 * 4 * 4 units
+        self.fc1 = nn.Linear(64 * 6 * 6, 512)
+
+        # fc2: outputShape[0] units, one for each action
+        self.fc2 = nn.Linear(512, action_size)
+
+    def forward(self, x):
+        x = F.relu(self.conv1(x))
+        x = F.relu(self.conv2(x))
+        x = F.relu(self.conv3(x))
+
+        x = x.view(x.shape[0], -1)
+
+        x = F.relu(self.fc1(x))
+
+        return self.fc2(x)
+
+
+
 #
 #
 class QNetwork3(nn.Module):
@@ -48,7 +78,7 @@ class QNetwork3(nn.Module):
             fc1_units (int): Number of nodes in first hidden layer
             fc2_units (int): Number of nodes in second hidden layer
         """
-        super(QNetwork2, self).__init__()
+        super(QNetwork3, self).__init__()
         nfilters = [128, 128*2, 128*2]
         self.seed = torch.manual_seed(seed)
         self.conv1 = nn.Conv3d(3, nfilters[0], kernel_size=(1, 3, 3), stride=(1,3,3))

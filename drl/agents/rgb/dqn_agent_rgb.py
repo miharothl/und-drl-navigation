@@ -8,7 +8,7 @@ import torch
 import torch.nn.functional as F
 import torch.optim as optim
 
-from drl.models.rgb.model_rgb import QNetwork2
+from drl.models.rgb.model_rgb import QNetwork2, QNetwork2a
 
 # BUFFER_SIZE = int(5e5)  # replay buffer size
 BUFFER_SIZE = int(1e5)  # replay buffer size
@@ -40,8 +40,8 @@ class DqnAgentRgb:
         self.seed = random.seed(seed)
 
         # Q-Network
-        self.qnetwork_local = QNetwork2(state_size, state_size, num_frames, action_size, seed).to(device)
-        self.qnetwork_target = QNetwork2(state_size, state_size, num_frames, action_size, seed).to(device)
+        self.qnetwork_local = QNetwork2a(state_size, state_size, num_frames, action_size, seed).to(device)
+        self.qnetwork_target = QNetwork2a(state_size, state_size, num_frames, action_size, seed).to(device)
         self.optimizer = optim.Adam(self.qnetwork_local.parameters(), lr=LR)
 
         # Replay memory

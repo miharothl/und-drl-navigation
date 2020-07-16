@@ -52,8 +52,8 @@ class Trainer:
             path = os.path.join(self.__path_models, model_filename)
             return path
 
-    def dqn_normal(self, agent, env, model_filename=None, n_episodes=10000, max_t=1000, eps_start=1.0, eps_end=0.01,
-                   eps_decay=0.995, terminate_soore=600.0):
+    def dqn_normal(self, agent, env, model_filename=None, n_episodes=10000, max_t=1000, eps_start=1.0, eps_end=0.05,
+                   eps_decay=0.995, terminate_soore=800.0):
         """Deep Q-Learning.
 
         Params
@@ -115,8 +115,8 @@ class Trainer:
 
         return scores
 
-    def dqn_rgb(self, agent, env, model_filename=None, n_episodes=10000, max_t=1000, eps_start=1.0, eps_end=0.03,
-                eps_decay=0.995, terminate_soore=500.0):
+    def dqn_rgb(self, agent, env, model_filename=None, n_episodes=10000, max_t=1000, eps_start=1.0, eps_end=0.05,
+                eps_decay=0.995, terminate_soore=800.0):
         """Deep Q-Learning.
 
         Params
