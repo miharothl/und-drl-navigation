@@ -8,7 +8,7 @@ import torch
 import torch.nn.functional as F
 import torch.optim as optim
 
-BUFFER_SIZE = int(5e5)  # replay buffer size
+BUFFER_SIZE = int(1e5)  # replay buffer size
 BATCH_SIZE = 64  # minibatch size
 # BATCH_SIZE = 128  # minibatch size
 GAMMA = 0.99  # discount factor
