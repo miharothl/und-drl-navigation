@@ -4,6 +4,7 @@ import torch
 import numpy as np
 from collections import deque
 import matplotlib.pyplot as plt
+import sys
 
 
 class Trainer:
@@ -91,11 +92,13 @@ class Trainer:
             eps = max(eps_end, eps_decay * eps)  # decrease epsilon
 
             model_filename = self.get_model_filename(i_episode, np.mean(scores_window), eps)
+            
+            sys.stdout.flush()
 
-            print('\rEpisode {}\tAverage Score: {:.2f}\tEpsilon: {:.2f}'.format(i_episode, np.mean(scores_window), eps),
+            print('\nEpisode {}\tAverage Score: {:.2f}\tEpsilon: {:.2f}'.format(i_episode, np.mean(scores_window), eps),
                   end="")
             if i_episode % 100 == 0:
-                print('\rEpisode {}\tAverage Score: {:.2f}\tEpsilon: {:.2f}'.format(i_episode, np.mean(scores_window),
+                print('\nEpisode {}\tAverage Score: {:.2f}\tEpsilon: {:.2f}'.format(i_episode, np.mean(scores_window),
                                                                                     eps))
                 torch.save(agent.qnetwork_local.state_dict(), model_filename)
 
@@ -164,10 +167,12 @@ class Trainer:
 
             model_filename = self.get_model_filename(i_episode, np.mean(scores_window), eps)
 
-            print('\rEpisode {}\tAverage Score: {:.2f}\tEpsilon: {:.2f}'.format(i_episode, np.mean(scores_window), eps),
+            sys.stdout.flush()
+
+            print('\nEpisode {}\tAverage Score: {:.2f}\tEpsilon: {:.2f}'.format(i_episode, np.mean(scores_window), eps),
                   end="")
             if i_episode % 100 == 0:
-                print('\rEpisode {}\tAverage Score: {:.2f}\tEpsilon: {:.2f}'.format(i_episode, np.mean(scores_window),
+                print('\nEpisode {}\tAverage Score: {:.2f}\tEpsilon: {:.2f}'.format(i_episode, np.mean(scores_window),
                                                                                     eps))
                 torch.save(agent.qnetwork_local.state_dict(), model_filename)
 

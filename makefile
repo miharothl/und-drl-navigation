@@ -1,6 +1,12 @@
 test: ## run pytest
 	pytest
 
+train: ## train 
+	./train.sh &
+
+train-rgb: ## train-rgb
+	./train-rgb.sh &
+
 
 .PHONY: help
 
