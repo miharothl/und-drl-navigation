@@ -6,11 +6,16 @@ from collections import deque
 import matplotlib.pyplot as plt
 import sys
 
+from drl.experiment.config import Config
+from drl.experiment.recorder import Recorder
+
 
 class Trainer:
-    def __init__(self, model_id, path_models='models'):
+    def __init__(self, model_id, config: Config, session_id, path_models='models'):
         self.__model_id = model_id
         self.__timestamp = self.get_timestamp()
+        self.__config = config
+        self.__session_id = session_id
         self.__path_models = path_models
 
     def plot(self, scores, filename):
@@ -75,12 +80,20 @@ class Trainer:
             agent.qnetwork_target.load_state_dict(torch.load(filename, map_location=lambda storage, loc: storage))
             eps = 0.78
 
+        recorder = Recorder(header=['episode', 'step', 'action', 'reward', 'reward_total'],
+                            session_id=self.__session_id,
+                            experiments_path=self.__config.get_app_experiments_path(train_mode=True),
+                            model=None)
+
         for i_episode in range(1, n_episodes + 1):
             state = env.reset()
             score = 0
             for t in range(max_t):
                 action = agent.act(state, eps)
                 next_state, reward, done, _ = env.step(action)
+
+                recorder.record([i_episode, t, action, reward, score])
+
                 agent.step(state, action, reward, next_state, done)
                 state = next_state
                 score += reward
@@ -115,6 +128,8 @@ class Trainer:
                 torch.save(agent.qnetwork_local.state_dict(), model_filename)
                 self.plot(scores)
                 break
+
+            recorder.save()
 
         return scores
 

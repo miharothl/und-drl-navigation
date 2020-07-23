@@ -1,6 +1,11 @@
 test: ## run pytest
 	pytest
 
+clean: ## clean
+	rm -r _tests	
+
+
+
 train: ## train 
 	./train.sh &
 

@@ -112,7 +112,9 @@ class DqnAgent:
         if random.random() > eps:
             return np.argmax(action_values.cpu().data.numpy())
         else:
+            # return random.choice(np.arange(-6, 6))
             return random.choice(np.arange(self.action_size))
+
 
     def learn(self, experiences, gamma):
         """Update value parameters using given batch of experience tuples.

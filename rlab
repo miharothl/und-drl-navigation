@@ -2,8 +2,10 @@
 import argparse
 
 from drl import logging
+from drl.experiment.analyser import Analyzer
 from drl.experiment.config import Config
 from drl.experiment.experiment import Experiment
+from drl.experiment.explorer import Explorer
 from drl.logging import init_logging, set_logging_level, transform_verbose_count_to_logging_level
 import logging
 import logging.config
@@ -23,12 +25,25 @@ def parse_arguments(params):
     ap.add_argument('-p', '--play',
                     action='store_true',
                     help="play")
+    ap.add_argument('-s', '--play_episodes',
+                    type=int,
+                    default=3,
+                    help="number of episodes to play")
     ap.add_argument('-e', '--env',
                     default='cartpole',
                     help="Environment")
     ap.add_argument('-l', '--list_envs',
                     action='store_true',
                     help="List RL environment")
+    ap.add_argument('--list_play_ex',
+                    action='store_true',
+                    help="List play experiments")
+    ap.add_argument('--list_train_ex',
+                    action='store_true',
+                    help="List train experiments")
+    ap.add_argument('--analyse_play_ex',
+                    action='store',
+                    help="Analyse play experiments")
     ap.add_argument("-m", '--select_model',
                     default='score_max',
                     choices=['score_max', 'score_min', 'score_median', 'random'],
@@ -56,9 +71,18 @@ def main():
         environment.set_env(args.env)
         agent = environment.create_agent()
         env = environment.create_env()
+        explorer = Explorer(config)
+        analyzer = Analyzer(config)
 
         if args.list_envs:
             environment.list_envs()
+        elif args.list_play_ex:
+            explorer.list_play_experiments()
+        elif args.list_train_ex:
+            explorer.list_train_experiments()
+        elif args.analyse_play_ex is not None:
+            a = analyzer.play_analysis(args.analyse_play_ex)
+            analyzer.log_analysis(a)
         elif args.train:
             environment.train(model=args.model_filename, num_episodes=10000)
 
@@ -70,15 +94,20 @@ def main():
 
                 environment.play(
                     mode='human',
-                    model=args.model_filename)
-
+                    model=args.model_filename,
+                    num_episodes=args.play_episodes
+                )
             #     # play.play_banana()
             # elif args.select_model == 'score_median':
             #     play.play(score_max=False, score_med=True, mode='human')
             # elif args.select_model == 'score_median':
             #     play.play(score_max=False, score_med=False, mode='human')
             else:
-                environment.play_dummy(mode='human')
+                environment.play_dummy(
+                    mode='human',
+                    model=None,
+                    num_episodes=args.play_episodes
+                )
 
                 # play.play(trained=False, mode='human')
 

@@ -1,14 +1,17 @@
+import os
+
 
 class Config:
-    def __init__(self, current_env='lunarlander'):
+    def __init__(self, current_env='lunarlander', test=False):
         self.__app = self.__set_app_config()
         self.__env = self.__set_env_config()
         self.__current_env = current_env
+        self.__test = test
 
     def get_app_config(self):
         return self.__app
 
-    def get_current_env(self, current_env):
+    def get_current_env(self):
         return self.__current_env
 
     def get_envs(self):
@@ -38,9 +41,25 @@ class Config:
     def get_current_agent_number_frames_flag(self):
          return self.__env[self.__current_env]['agent']['num_frames']
 
+    def get_app_experiments_path(self, train_mode=True):
+
+        if self.__test:
+            if train_mode:
+                return os.path.join(self.__app['path_tests'], self.__app['path_experiments'], self.__app['path_train'])
+            else:
+                return os.path.join(self.__app['path_tests'], self.__app['path_experiments'], self.__app['path_play'])
+        else:
+            if train_mode:
+                return os.path.join(self.__app['path_experiments'], self.__app['path_train'])
+            else:
+                return os.path.join(self.__app['path_experiments'], self.__app['path_play'])
+
     def __set_app_config(self):
         config = {
-            'path_models': 'models'
+            'path_experiments': '_experiments',
+            'path_tests': '_tests',
+            'path_play': 'play',
+            'path_train': 'train',
         }
 
         return config
@@ -99,6 +118,19 @@ class Config:
             #                 'terminate_score': 300,
             #             }
             #     },
+            'breakout': {
+                   'id': 'Breakout-ram-v4',
+                   'agent': {
+                       'action_size': 3,
+                       'state_size': 128,
+                       'discrete': True,
+                       'state_rgb': False,
+                       'num_frames': 4,
+                   },
+                   'train': {
+                       'terminate_score': 1000,
+                   }
+               },
             'spaceinvaders': {
                     'id': 'SpaceInvaders-ram-v0',
                     'agent': {

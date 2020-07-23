@@ -1,50 +1,88 @@
 import os
+
 import pandas as pd
 import torch
 import matplotlib.pyplot as plt
+from numpy import random
 
+from drl.experiment.config import Config
+from drl.experiment.recorder import Recorder
 from drl.image import imshow
 
 
 class Player:
-    def __init__(self, env, agent, model_id, path_models='models'):
+    def __init__(self, env, agent, model_id, config: Config, session_id, path_models='models'):
         self.__env = env
         self.__agent = agent
         self.__model_id = model_id
+        self.__config = config
+        self.__session_id = session_id
         self.__path_models = path_models
 
     def play(self, trained, mode, is_rgb, model_filename, num_episodes, num_steps):
 
         if is_rgb:
-            self.play_rgb(num_episodes=num_episodes, num_steps=num_steps, trained=trained, mode=mode, model_filename=model_filename)
+            return self.play_rgb(num_episodes=num_episodes, num_steps=num_steps, trained=trained, mode=mode, model_filename=model_filename)
         else:
-            self.play_classic(num_episodes=num_episodes, num_steps=num_steps, trained=trained, mode=mode, model_filename=model_filename)
+            return self.play_classic(num_episodes=num_episodes, num_steps=num_steps, trained=trained, mode=mode, model_filename=model_filename)
 
-    def play_classic(self, num_episodes=3, score_max=True, score_med=False, trained=True, mode='rgb_array', model_filename=None, num_steps=None):
+    def play_classic( self, num_episodes=3, score_max=True, score_med=False, trained=True, mode='rgb_array', model_filename=None, num_steps=None):
+
+        recorder = Recorder(header=['episode', 'step', 'action', 'reward', 'reward_total'],
+                            session_id=self.__session_id,
+                            experiments_path=self.__config.get_app_experiments_path(train_mode=False),
+                            model=None)
 
         if trained or (model_filename is not None):
             filename = self.select_model_filename(score_max, score_med, model_filename=model_filename)
             self.__agent.qnetwork_local.load_state_dict(torch.load(filename, map_location=lambda storage, loc: storage))
 
         for i in range(num_episodes):
+            scores = []
+            reward_total = 0
+            step = 0
             state = self.__env.reset()
             self.__env.render(mode=mode)
 
             if num_steps is None:
                 while True:
-                    action = self.__agent.act(state)
+                    if trained:
+                        action = self.__agent.act(state)
+                    else:
+                        action = self.__agent.act(state, eps=1.)
+                    # action= random.choice([1,2,3])
+                    action = action +1
                     self.__env.render(mode=mode)
                     state, reward, done, _ = self.__env.step(action)
+                    reward_total += reward
+                    step += 1
+
+                    recorder.record([i, step, action, reward, reward_total])
+
                     if done:
                         break
             else:
                 for j in range(num_steps):
-                    action = self.__agent.act(state)
+                    if trained:
+                        action = self.__agent.act(state)
+                    else:
+                        action = self.__agent.act(state, eps=1.)
+
                     self.__env.render(mode=mode)
                     state, reward, done, _ = self.__env.step(action)
+                    reward_total += reward
+                    step += 1
+
+                    recorder.record([i, step, action, reward, reward_total])
+
                     if done:
                         break
-        pass
+
+            scores.append([[i, reward_total, step]])
+
+            recorder.save()
+
+        return scores
 
     def play_rgb(self, num_episodes=3, score_max=True, score_med=False, trained=True, mode='rgb_array', model_filename=None, num_steps=None):
 
@@ -53,6 +91,9 @@ class Player:
             self.__agent.qnetwork_local.load_state_dict(torch.load(filename, map_location=lambda storage, loc: storage))
 
         for i in range(num_episodes):
+            scores = []
+            reward_total = 0
+            steps_total = 0
             state = self.__env.reset()
             image = self.__env.render(mode=mode)
 
@@ -63,6 +104,9 @@ class Player:
                     action = self.__agent.act(image2)
                     self.__env.render(mode=mode)
                     state, reward, done, _ = self.__env.step(action)
+                    reward_total += reward
+                    steps_total += 1
+
                     if done:
                         break
             else:
@@ -70,9 +114,14 @@ class Player:
                     action = self.__agent.act(image2)
                     self.__env.render(mode=mode)
                     state, reward, done, _ = self.__env.step(action)
+                    reward_total += reward
+                    steps_total += j
+
                     if done:
                         break
-        pass
+            scores.append([[i, reward_total, steps_total]])
+
+        return scores
 
     def play_plot(self, score_max=True, score_med=False):
 

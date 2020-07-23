@@ -1,7 +1,9 @@
+
 import gym
 import logging
 
 from gym.spaces import Discrete
+from datetime import datetime
 
 # from unityagents import UnityEnvironment
 
@@ -22,11 +24,14 @@ from drl.experiment.trainer import Trainer
 class Experiment:
     def __init__(self, config: Config):
         self.__config = config
+        self.__timestamp = datetime.now().strftime("%Y%m%dT%H%M")
 
     def play(self, mode, model, num_episodes=3, trained=True, num_steps=None):
         player = Player(model_id=self.__config.get_current_model_id(),
                         env=self.create_env(),
-                        agent=self.create_agent())
+                        agent=self.create_agent(),
+                        config = self.__config,
+                        session_id = self.get_session_id())
 
         player.play(trained=trained,
                     mode=mode,
@@ -36,14 +41,18 @@ class Experiment:
                     num_steps=num_steps)
 
     def play_dummy(self, mode, model, num_episodes=3, num_steps=None):
-        self.play(trained=False,
+        scores = self.play(trained=False,
                   mode=mode,
                   model=model,
                   num_episodes=num_episodes,
                   num_steps=num_steps)
 
     def train(self, model=None, num_episodes=10000):
-        trainer = Trainer(self.__config.get_current_model_id())
+        trainer = Trainer(
+            config=self.__config,
+            session_id=self.get_session_id(),
+            model_id=self.__config.get_current_model_id())
+
         return trainer.train(self.create_agent(),
                              self.create_env(),
                              self.__config.get_current_agent_state_rgb_flag(),
@@ -101,3 +110,12 @@ class Experiment:
              print(e)
 
         return envs
+
+    def get_timestamp(self):
+        return self.__timestamp
+
+    def get_session_id(self):
+        return "{}-{}".format(
+            self.__config.get_current_env(),
+            self.get_timestamp()
+        )
