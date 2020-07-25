@@ -89,37 +89,43 @@ class Trainer:
             state = env.reset()
             score = 0
 
-            lives = -1
-            new_life = False
+            if self.__config.get_current_env_is_atari_flag():
+                lives = -1
+                new_life = False
 
             for t in range(max_t):
                 action = agent.act(state, eps)
 
-                if new_life:
-                    action = 0
+                if self.__config.get_current_env_is_atari_flag():
+                    if self.__config.get_current_agent_start_game_action_required():
+                        if new_life:
+                            action = self.__config.get_current_agent_start_game_action()
 
-                action = action + 1
+                action = action + self.__config.get_current_agent_state_offset()
+
                 if 0: #debug
                     env.render(mode='human')
 
                 next_state, reward, done, info = env.step(action)
 
+                # debug
                 if reward > 0:
                     print('\nreward!')
 
-                if info['ale.lives'] > lives:
-                    lives = info['ale.lives']
-                    new_life = True
-                elif info['ale.lives'] < lives:
-                    lives = info['ale.lives']
-                    new_life = True
-                    reward = reward - 1
-                else:
-                    new_life = False
+                if self.__config.get_current_env_is_atari_flag():
+                    if info['ale.lives'] > lives:
+                        lives = info['ale.lives']
+                        new_life = True
+                    elif info['ale.lives'] < lives:
+                        lives = info['ale.lives']
+                        new_life = True
+                        reward = reward - 1
+                    else:
+                        new_life = False
 
                 recorder.record([i_episode, t, action, reward, score])
 
-                action = action-1
+                action = action - self.__config.get_current_agent_state_offset()
 
                 agent.step(state, action, reward, next_state, done)
                 state = next_state

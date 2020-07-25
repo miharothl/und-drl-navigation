@@ -58,7 +58,8 @@ class Player:
                     if new_life:
                         action = 0
 
-                    action = action + 1
+                    action = action + self.__config.get_current_agent_state_offset()
+
                     self.__env.render(mode=mode)
 
                     state, reward, done, info = self.__env.step(action)

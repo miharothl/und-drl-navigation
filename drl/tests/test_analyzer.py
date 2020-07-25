@@ -7,7 +7,7 @@ from drl.experiment.explorer import Explorer
 
 class TestAnalyser:
 
-    # @pytest.mark.depends(on=['test_play'])
+    @pytest.mark.depends(on=['test_play'])
     def test_listPlayExperiments_experimentsExist_returnsExperiments(self):
 
         config = Config(test=True)
