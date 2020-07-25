@@ -58,8 +58,8 @@ class Trainer:
             path = os.path.join(self.__path_models, model_filename)
             return path
 
-    def dqn_normal(self, agent, env, model_filename=None, n_episodes=10000, max_t=1000, eps_start=1.0, eps_end=0.05,
-                   eps_decay=0.995, terminate_soore=800.0):
+    def dqn_normal(self, agent, env, model_filename=None, n_episodes=10000, max_t=5000, eps_start=1.0, eps_end=0.15,
+                   eps_decay=0.9990, terminate_soore=800.0):
         """Deep Q-Learning.
 
         Params
@@ -88,11 +88,38 @@ class Trainer:
         for i_episode in range(1, n_episodes + 1):
             state = env.reset()
             score = 0
+
+            lives = -1
+            new_life = False
+
             for t in range(max_t):
                 action = agent.act(state, eps)
-                next_state, reward, done, _ = env.step(action)
+
+                if new_life:
+                    action = 0
+
+                action = action + 1
+                if 0: #debug
+                    env.render(mode='human')
+
+                next_state, reward, done, info = env.step(action)
+
+                if reward > 0:
+                    print('\nreward!')
+
+                if info['ale.lives'] > lives:
+                    lives = info['ale.lives']
+                    new_life = True
+                elif info['ale.lives'] < lives:
+                    lives = info['ale.lives']
+                    new_life = True
+                    reward = reward - 1
+                else:
+                    new_life = False
 
                 recorder.record([i_episode, t, action, reward, score])
+
+                action = action-1
 
                 agent.step(state, action, reward, next_state, done)
                 state = next_state

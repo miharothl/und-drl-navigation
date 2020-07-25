@@ -14,8 +14,7 @@ BATCH_SIZE = 64  # minibatch size
 GAMMA = 0.99  # discount factor
 TAU = 1e-3  # for soft update of target parameters
 LR = 5e-4  # learning rate
-# UPDATE_EVERY = 4  # how often to update the network
-UPDATE_EVERY = 10  # how often to update the network
+UPDATE_EVERY = 4  # how often to update the network
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -47,6 +46,11 @@ class DqnAgent:
         self.t_step = 0
 
         self.__frames = deque(maxlen=num_frames)
+
+        self.__loss_window = deque(maxlen=100)
+        self.__pos_reward_window = deque(maxlen=100)
+        self.__neg_reward_window = deque(maxlen=100)
+        self.__epoch = 0
 
     def preprocess(self, raw_state):
 
@@ -115,7 +119,6 @@ class DqnAgent:
             # return random.choice(np.arange(-6, 6))
             return random.choice(np.arange(self.action_size))
 
-
     def learn(self, experiences, gamma):
         """Update value parameters using given batch of experience tuples.
 
@@ -136,6 +139,16 @@ class DqnAgent:
 
         # Compute loss
         loss = F.mse_loss(Q_expected, Q_targets)
+
+        self.__pos_reward_window.append(float(torch.sum(rewards == 1))/rewards.shape[0])
+        self.__neg_reward_window.append(float(torch.sum(rewards == -1))/rewards.shape[0])
+        self.__loss_window.append(loss.item())
+
+        self.__epoch += 1
+
+        if self.__epoch % 100 == 0:
+            print("\nloss: {:.10f}, pos_reward: {:.3f}, neg_reward: {:.3f}".format(np.mean(self.__loss_window), np.mean(self.__pos_reward_window), np.mean(self.__neg_reward_window)))
+
         # Minimize the loss
         self.optimizer.zero_grad()
         loss.backward()
@@ -176,7 +189,6 @@ class ReplayBuffer:
         self.batch_size = batch_size
         self.experience = namedtuple("Experience", field_names=["state", "action", "reward", "next_state", "done"])
         self.seed = random.seed(seed)
-
 
     def add(self, state, action, reward, next_state, done):
         # state = self.preprocess(state)

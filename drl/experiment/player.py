@@ -44,6 +44,9 @@ class Player:
             state = self.__env.reset()
             self.__env.render(mode=mode)
 
+            lives = -1
+            new_life = False
+
             if num_steps is None:
                 while True:
                     if trained:
@@ -51,9 +54,25 @@ class Player:
                     else:
                         action = self.__agent.act(state, eps=1.)
                     # action= random.choice([1,2,3])
-                    action = action +1
+
+                    if new_life:
+                        action = 0
+
+                    action = action + 1
                     self.__env.render(mode=mode)
-                    state, reward, done, _ = self.__env.step(action)
+
+                    state, reward, done, info = self.__env.step(action)
+
+                    if info['ale.lives'] > lives:
+                        lives = info['ale.lives']
+                        new_life = True
+                    elif info['ale.lives'] < lives:
+                        lives = info['ale.lives']
+                        new_life = True
+                        reward = reward - 1
+                    else:
+                        new_life = False
+
                     reward_total += reward
                     step += 1
 
