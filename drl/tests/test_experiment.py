@@ -50,7 +50,8 @@ class TestExperiment:
             assert a is not None
             assert e is not None
 
-            num_episodes = 1
-            scores = experiment.train(num_episodes=num_episodes)
+            max_steps = 128
+            max_episode_steps = 2
+            scores = experiment.train(max_steps=max_steps, eval_frequency=16, eval_steps=4, max_episode_steps=max_episode_steps)
 
-            assert len(scores) == num_episodes
+            assert len(scores) == max_steps / max_episode_steps

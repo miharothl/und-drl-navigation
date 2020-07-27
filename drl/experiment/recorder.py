@@ -5,12 +5,13 @@ from typing import List, Tuple, Dict
 from pathlib import Path
 
 class Recorder:
-    def __init__(self, header: List, experiments_path,  session_id, model):
+    def __init__(self, header: List, experiments_path,  session_id, model, log_prefix = ''):
         self.__header = header
         self.__parameters = []
         self.__session_id = session_id
         self.__model = model
         self.__experiments_path = experiments_path
+        self.__log_prefix = log_prefix
         pass
 
     def get_header(self) -> List:
@@ -45,7 +46,7 @@ class Recorder:
     def __save_log(self):
         session_path = os.path.join(self.__experiments_path, self.__session_id)
         Path(session_path).mkdir(parents=True, exist_ok=True)
-        log_path = os.path.join(session_path, 'log.csv')
+        log_path = os.path.join(session_path, self.__log_prefix + 'log.csv')
 
         df = self.get_dataframe()
         df.to_csv(log_path, index=False)
@@ -57,5 +58,5 @@ class Recorder:
             return json.load(fp)
 
     def __load_log(self) -> pd.DataFrame:
-        file_path = os.path.join(self.__experiments_path, self.__session_id, 'log.csv')
+        file_path = os.path.join(self.__experiments_path, self.__session_id, self.__log_prefix + 'log.csv')
         return pd.read_csv(file_path)

@@ -1,4 +1,6 @@
 import os
+from pathlib import Path
+
 import pandas as pd
 from typing import Dict
 
@@ -8,8 +10,9 @@ from drl.experiment.config import Config
 
 class Analyzer:
 
-    def __init__(self, config: Config):
+    def __init__(self, config: Config, session_id):
         self.__config = config
+        self.__session_id = session_id
         pass
 
     def play_analysis(self, path_to_experiment) -> Dict:
@@ -23,7 +26,7 @@ class Analyzer:
         analysis['number_of_episodes'] = df['episode'].max() + 1
         analysis['average_number_of_steps'] = df.groupby('episode').count()['step'].mean()
         analysis['average_reward_per_step'] = df.groupby('episode').mean()['reward'].mean()
-        analysis['average_reward'] = df.groupby('episode').max()['reward_total'].mean()
+        analysis['average_reward'] = df.groupby('episode').max()['reward_total'].sum()
 
         """
 
@@ -35,16 +38,52 @@ class Analyzer:
         """
         return analysis
 
+    def compare_train_epoch_cols(self, path_to_experiments, compare_col) -> Dict:
+
+        max_x = 0
+
+        for path_to_experiment in path_to_experiments:
+            path = os.path.join(path_to_experiment, 'epoch-log.csv')
+            df = pd.read_csv(path, index_col=0)
+            if df.shape[0] > max_x:
+                max_x = df.shape[0]
+
+        df_main = pd.DataFrame(list(range(max_x)))
+
+        for path_to_experiment in path_to_experiments:
+            path = os.path.join(path_to_experiment, 'epoch-log.csv')
+
+            df_tmp = pd.read_csv(path, index_col=0)
+
+            df_tmp = df_tmp[[compare_col]]
+
+            df_tmp.columns = [(path_to_experiment.rsplit('/', 1)[1])]
+
+            df_main = df_main.join(df_tmp)
+
+
+        df_main = df_main[df_main.columns.difference([0])]
+
+        ax = df_main.plot()
+
+        ax.set_xlabel('epoch')
+        ax.set_ylabel(compare_col)
+
+        from matplotlib import pyplot
+        fig = ax.get_figure()
+
+        path = os.path.join(self.__config.get_app_analysis_path(), self.__session_id)
+        Path(path).mkdir(parents=True, exist_ok=True)
+
+        path = os.path.join(path, compare_col +'.png' )
+        fig.savefig(path)
+
+        return path
+
     def log_analysis(self, analysis: Dict):
         for key in analysis.keys():
             print("{}: {}".format(key, analysis[key]))
 
-    def train_analysis(self):
-        """
-
-        :return:
-        """
-        return {}
 
 
 

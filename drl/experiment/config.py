@@ -26,6 +26,24 @@ class Config:
     def get_current_env_is_atari_flag(self):
         return self.__env[self.__current_env]['env']['is_atari']
 
+    def get_current_env_train_max_steps(self):
+         return self.__env[self.__current_env]['train']['max_steps']
+
+    def get_current_env_train_max_episodes_steps(self):
+        return self.__env[self.__current_env]['train']['max_episode_steps']
+
+    def get_current_env_train_train_eval_frequency(self):
+        return self.__env[self.__current_env]['train']['eval_frequency']
+
+    def get_current_env_train_eval_steps(self):
+        return self.__env[self.__current_env]['train']['eval_steps']
+
+    def get_current_env_train_epsilon(self):
+        return self.__env[self.__current_env]['train']['epsilon']
+
+    def get_current_env_train_is_human_flag(self):
+        return self.__env[self.__current_env]['train']['human_flag']
+
     def get_current_num_frames(self):
         return self.__env[self.__current_env]['agent']['num_frames']
 
@@ -52,6 +70,19 @@ class Config:
 
     def get_current_agent_number_frames_flag(self):
         return self.__env[self.__current_env]['agent']['num_frames']
+
+    def get_app_analysis_path(self, train_mode=True):
+
+        if self.__test:
+            if train_mode:
+                return os.path.join(self.__app['path_tests'], self.__app['path_experiments'], 'analysis')
+            else:
+                return os.path.join(self.__app['path_tests'], self.__app['path_experiments'], 'analysis')
+        else:
+            if train_mode:
+                return os.path.join(self.__app['path_experiments'], 'analysis')
+            else:
+                return os.path.join(self.__app['path_experiments'], 'analysis')
 
     def get_app_experiments_path(self, train_mode=True):
 
@@ -94,7 +125,12 @@ class Config:
                             'start_game_action': 0,
                         },
                     'train': {
-                            'terminate_score': 300,
+                            'max_steps': 1000000,
+                            'max_episode_steps': 1000,
+                            'eval_frequency': 20000,
+                            'eval_steps': 3000,
+                            'epsilon': 0.995,
+                            'human_flag': False,
                         },
                 },
             'lunarlander-4f': {
@@ -113,8 +149,13 @@ class Config:
                             'start_game_action': 0,
                         },
                     'train': {
-                            'terminate_score': 300,
-                        },
+                            'max_steps': 1000000,
+                            'max_episode_steps': 1000,
+                            'eval_frequency': 20000,
+                            'eval_steps': 3000,
+                            'epsilon': 0.995,
+                            'human_flag': False,
+                       },
                 },
             'cartpole': {
                     'id': 'CartPole-v1',
@@ -126,13 +167,18 @@ class Config:
                             'state_size': 4,
                             'discrete': True,
                             'state_rgb': False,
-                            'num_frames': 1,
+                            'num_frames': 5,
                             'state_offset': 0,
                             'start_game_action_required': False,
                             'start_game_action': 0,
                         },
                     'train': {
-                            'terminate_score': 300,
+                            'max_steps': 1000000,
+                            'max_episode_steps': 1000,
+                            'eval_frequency': 5000,
+                            'eval_steps': 500,
+                            'epsilon': 0.99995,
+                            'human_flag': False,
                         }
                 },
             # 'banana': {
@@ -161,10 +207,15 @@ class Config:
                            'num_frames': 4,
                            'state_offset': 1,
                            'start_game_action_required': True,
-                           'start_game_action': 1,
+                           'start_game_action': 0,
                    },
                    'train': {
-                       'terminate_score': 1000,
+                           'max_steps': 10000,
+                           'max_episode_steps': 2000,
+                           'eval_frequency': 20000,
+                           'eval_steps': 2000,
+                           'epsilon': 0.995,
+                           'human_flag': True,
                    }
                },
             'spaceinvaders': {
@@ -183,28 +234,33 @@ class Config:
                             'start_game_action': 0,
                         },
                     'train': {
-                            'terminate_score': 1000,
+                            'max_steps': 10000,
+                            'max_episode_steps': 2000,
+                            'eval_frequency': 20000,
+                            'eval_steps': 2000,
+                            'epsilon': 0.995,
+                            'human_flag': True,
                         }
                 },
-            'spaceinvaders-rgb': {
-                    'id': 'SpaceInvaders-v0',
-                    'env': {
-                        'is_atari': True,
-                    },
-                    'agent': {
-                            'action_size': 6,
-                            'state_size': 84,
-                            'discrete': True,
-                            'state_rgb': True,
-                            'num_frames': 4,
-                            'state_offset': 0,
-                            'start_game_action_required': False,
-                            'start_game_action': 0,
-                        },
-                    'train': {
-                            'terminate_score': 1000,
-                        }
-                },
+            # 'spaceinvaders-rgb': {
+            #         'id': 'SpaceInvaders-v0',
+            #         'env': {
+            #             'is_atari': True,
+            #         },
+            #         'agent': {
+            #                 'action_size': 6,
+            #                 'state_size': 84,
+            #                 'discrete': True,
+            #                 'state_rgb': True,
+            #                 'num_frames': 4,
+            #                 'state_offset': 0,
+            #                 'start_game_action_required': False,
+            #                 'start_game_action': 0,
+            #             },
+            #         'train': {
+            #                 'terminate_score': 1000,
+            #             }
+            #     },
         }
 
         return config

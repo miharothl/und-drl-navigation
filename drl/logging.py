@@ -22,5 +22,5 @@ def set_logging_level(level):
 
 
 def transform_verbose_count_to_logging_level(count):
-    return max(3 - count, 0) * 10
+    return max(5 - count, 0) * 10
 

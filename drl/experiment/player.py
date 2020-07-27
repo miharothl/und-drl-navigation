@@ -1,9 +1,5 @@
-import os
-
-import pandas as pd
 import torch
 import matplotlib.pyplot as plt
-from numpy import random
 
 from drl.experiment.config import Config
 from drl.experiment.recorder import Recorder
@@ -34,8 +30,7 @@ class Player:
                             model=None)
 
         if trained or (model_filename is not None):
-            filename = self.select_model_filename(score_max, score_med, model_filename=model_filename)
-            self.__agent.qnetwork_local.load_state_dict(torch.load(filename, map_location=lambda storage, loc: storage))
+            self.__agent.qnetwork_local.load_state_dict(torch.load(model_filename, map_location=lambda storage, loc: storage))
 
         for i in range(num_episodes):
             scores = []
@@ -44,8 +39,9 @@ class Player:
             state = self.__env.reset()
             self.__env.render(mode=mode)
 
-            lives = -1
-            new_life = False
+            if self.__config.get_current_env_is_atari_flag():
+                lives = -1
+                new_life = False
 
             if num_steps is None:
                 while True:
@@ -53,26 +49,26 @@ class Player:
                         action = self.__agent.act(state)
                     else:
                         action = self.__agent.act(state, eps=1.)
-                    # action= random.choice([1,2,3])
 
-                    if new_life:
-                        action = 0
-
-                    action = action + self.__config.get_current_agent_state_offset()
+                    if self.__config.get_current_env_is_atari_flag():
+                        if self.__config.get_current_agent_start_game_action_required():
+                            if new_life:
+                                action = self.__config.get_current_agent_start_game_action()
 
                     self.__env.render(mode=mode)
 
                     state, reward, done, info = self.__env.step(action)
 
-                    if info['ale.lives'] > lives:
-                        lives = info['ale.lives']
-                        new_life = True
-                    elif info['ale.lives'] < lives:
-                        lives = info['ale.lives']
-                        new_life = True
-                        reward = reward - 1
-                    else:
-                        new_life = False
+                    if self.__config.get_current_env_is_atari_flag():
+                        if info['ale.lives'] > lives:
+                            lives = info['ale.lives']
+                            new_life = True
+                        elif info['ale.lives'] < lives:
+                            lives = info['ale.lives']
+                            new_life = True
+                            reward = reward - 1
+                        else:
+                            new_life = False
 
                     reward_total += reward
                     step += 1
@@ -218,53 +214,3 @@ class Player:
 
         print("Score: {}".format(score))
 
-
-    def get_model_filename(self, model_filename):
-        path = os.path.join(self.__path_models, model_filename)
-        return path
-
-    def select_model_filename(self, score_max=True, score_med=False, model_filename=None):
-        if model_filename is not None:
-            path = os.path.join(self.__path_models, model_filename)
-            return path
-
-        import re
-        model_id = re.sub('[^0-9a-zA-Z.]+', '', self.__model_id)
-        model_id = model_id.lower()
-
-        import glob
-        models = glob.glob(os.path.join(self.__path_models, "{}*".format(model_id)))
-
-        models = [os.path.basename(m) for m in models]
-        models = [m.rstrip(".pth") for m in models]
-        models = [m.split('_') for m in models]
-
-        df = pd.DataFrame(models,
-                          columns=['model_id', 'timestamp', 'episode', 'score', 'epsilon'])
-
-        df['score'] = df['score'].astype(float)
-
-        select = ""
-        if score_max:
-            select = "Selected model (max score): {}"
-            df = df.loc[df['score'] == df['score'].max()]
-        elif score_med:
-            select = "Selected model (median score): {}"
-            df = df.loc[df['score'] == df['score'].median()]
-        else:
-            select = "Selected model (min score): {}"
-            df = df.loc[df['score'] == df['score'].min()]
-
-        timestamp = df['timestamp'].iloc[0]
-        model_id = df['model_id'].iloc[0]
-        episode = df['episode'].iloc[0]
-        score = df['score'].iloc[0]
-        epsilon = df['epsilon'].iloc[0]
-
-        filename = "{}_{}_{}_{:.2f}_{}.pth".format(model_id, timestamp, episode, score, epsilon)
-
-        path = os.path.join(self.__path_models, filename)
-
-        print(select.format(path))
-
-        return path

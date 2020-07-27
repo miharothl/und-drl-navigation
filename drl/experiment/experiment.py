@@ -1,4 +1,3 @@
-
 import gym
 import logging
 
@@ -13,14 +12,6 @@ from drl.experiment.config import Config
 from drl.experiment.player import Player
 from drl.experiment.trainer import Trainer
 
-
-# _Experiments
-#   _alias_session
-      # _models
-      # _logs
-      # time, score, eps
-
-
 class Experiment:
     def __init__(self, config: Config):
         self.__config = config
@@ -30,8 +21,8 @@ class Experiment:
         player = Player(model_id=self.__config.get_current_model_id(),
                         env=self.create_env(),
                         agent=self.create_agent(),
-                        config = self.__config,
-                        session_id = self.get_session_id())
+                        config=self.__config,
+                        session_id=self.get_session_id())
 
         player.play(trained=trained,
                     mode=mode,
@@ -41,13 +32,19 @@ class Experiment:
                     num_steps=num_steps)
 
     def play_dummy(self, mode, model, num_episodes=3, num_steps=None):
-        scores = self.play(trained=False,
+        self.play(trained=False,
                   mode=mode,
                   model=model,
                   num_episodes=num_episodes,
                   num_steps=num_steps)
 
-    def train(self, model=None, num_episodes=10000):
+    def train(self, model=None,
+              max_steps=10000,
+              max_episode_steps=18000,
+              eval_frequency=10000,
+              eval_steps=10000,
+              eps_decay=0.99,
+              is_human_flag=False):
         trainer = Trainer(
             config=self.__config,
             session_id=self.get_session_id(),
@@ -57,7 +54,13 @@ class Experiment:
                              self.create_env(),
                              self.__config.get_current_agent_state_rgb_flag(),
                              model_filename=model,
-                             num_episodes=num_episodes)
+                             max_steps=max_steps,
+                             max_episode_steps=max_episode_steps,
+                             eval_frequency=eval_frequency,
+                             eval_steps=eval_steps,
+                             is_human_flag=is_human_flag,
+                             eps_decay=eps_decay,
+                             )
 
     def set_env(self, env):
         self.__config.set_current_env(env)
@@ -107,7 +110,7 @@ class Experiment:
     def list_envs(self):
         envs = self.__config.get_envs()
         for e in envs:
-             print(e)
+            print(e)
 
         return envs
 
