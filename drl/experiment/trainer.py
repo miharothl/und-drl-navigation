@@ -89,7 +89,7 @@ class Trainer:
             eps = 0.78
 
         epoch_recorder = Recorder(
-            header=['epoch', 'avg_score', 'avg_val_score', 'epsilon'],
+            header=['epoch', 'avg_score', 'avg_val_score', 'epsilon', 'avg_loss'],
             session_id=self.__session_id,
             experiments_path=self.__config.get_app_experiments_path(train_mode=True),
             model=None,
@@ -98,7 +98,7 @@ class Trainer:
         )
 
         episode_recorder = Recorder(
-            header=['step', 'epoch', 'epoch step', 'episode', 'episode step', 'score', 'epsilon',
+            header=['step', 'episode', 'epoch', 'epoch step', 'epoch_episode', 'episode step', 'score', 'epsilon',
                     'avg_pos_reward_ratio', 'avg_neg_reward_ratio', 'avg_loss'],
             session_id=self.__session_id,
             experiments_path=self.__config.get_app_experiments_path(train_mode=True),
@@ -114,6 +114,7 @@ class Trainer:
 
         step = 0
         epoch = 0
+        episode = 0
 
         while step < MAX_STEPS:
 
@@ -124,7 +125,7 @@ class Trainer:
             ################################################################################
 
             terminal = True
-            episode = 0
+            epoch_episode = 0
 
             while (epoch_step < EVAL_FREQUENCY) and (step < MAX_STEPS):
 
@@ -141,7 +142,7 @@ class Trainer:
 
                         state = env.reset()
                         score = 0
-                        episode += 1
+                        epoch_episode += 1
 
                         if self.__config.get_current_env_is_atari_flag():
                             lives = -1
@@ -194,24 +195,26 @@ class Trainer:
                         break
 
                     logging.debug(
-                        'Step: {}\tEpoch: {}\tEpoch Step: {}\tEpisode: {}\tEpisode Step: {}\tScore: {:.2f}'
+                        'Step: {}\tEpisode: {}\tEpoch: {}\tEpoch Step: {}\tEpoch Episode: {}\tEpisode Step: {}\tScore: {:.2f}'
                         '\tEpsilon: {:.2f}\tAvg Pos Reward Ratio: {:.3f}\tAvg Neg Reward Ratio: {:.3f}\tLoss {:.6f}'
-                            .format(step, epoch, epoch_step, episode, episode_step, score, eps,
+                            .format(step, episode, epoch, epoch_step, epoch_episode, episode_step, score, eps,
                                     np.mean(pos_reward_ratio_window) if len(pos_reward_ratio_window) > 0 else 0,
                                     np.mean(neg_reward_ratio_window) if len(neg_reward_ratio_window) > 0 else 0,
                                     np.mean(loss_window) if len(loss_window) > 0 else 0))
                 logging.warning(
-                    'Step: {}\tEpoch: {}\tEpoch Step: {}\tEpisode: {}\tEpisode Step: {}\tScore: {:.2f}'
+                    'Step: {}\tEpisode: {}\tEpoch: {}\tEpoch Step: {}\tEpoch Episode: {}\tEpisode Step: {}\tScore: {:.2f}'
                     '\tEpsilon: {:.2f}\tAvg Pos Reward Ratio: {:.3f}\tAvg Neg Reward Ratio: {:.3f}\tLoss {:.6f}'
-                        .format(step, epoch, epoch_step, episode, episode_step, score, eps,
+                        .format(step, episode, epoch, epoch_step, epoch_episode, episode_step, score, eps,
                                 np.mean(pos_reward_ratio_window) if len(pos_reward_ratio_window) > 0 else 0,
                                 np.mean(neg_reward_ratio_window) if len(neg_reward_ratio_window) > 0 else 0,
                                 np.mean(loss_window) if len(loss_window) > 0 else 0))
 
-                episode_recorder.record([step, epoch, epoch_step, episode, episode_step, score, eps,
+                episode_recorder.record([step, episode, epoch, epoch_step, epoch_episode, episode_step, score, eps,
                                          np.mean(pos_reward_ratio_window) if len(pos_reward_ratio_window) > 0 else 0,
                                          np.mean(neg_reward_ratio_window) if len(neg_reward_ratio_window) > 0 else 0,
                                          np.mean(loss_window) if len(loss_window) > 0 else 0])
+
+                episode += 1
 
                 if step <= MAX_STEPS:
                     scores_window.append(score)  # save most recent score
@@ -233,11 +236,11 @@ class Trainer:
             val_scores_window = deque(maxlen=100)  # last 100 scores
 
             terminal = True
-            episode = 0
+            epoch_val_episode = 0
 
             while val_step < EVAL_STEPS:
 
-                for episode_step in range(MAX_EPISODE_STEPS):
+                for episode_val_step in range(MAX_EPISODE_STEPS):
 
                     if val_step >= EVAL_STEPS:
                         break
@@ -248,7 +251,7 @@ class Trainer:
 
                         state = env.reset()
                         score = 0
-                        episode += 1
+                        epoch_val_episode += 1
 
                         if self.__config.get_current_env_is_atari_flag():
                             lives = -1
@@ -291,12 +294,12 @@ class Trainer:
                         break
 
                     logging.debug(
-                        'Step: {}\tEpoch: {}\tVal Step: {}\tEpisode: {}\tEpisode Step: {}\tVal Score: {:.2f}\tEpsilon: {:.2f}'
-                            .format(step, epoch, val_step, episode, episode_step, score, eps))
+                        'Epoch: {}\tVal Step: {}\tEpoch Val Episode: {}\tEpisode Step: {}\tVal Score: {:.2f}\tEpsilon: {:.2f}'
+                            .format(epoch, val_step, epoch_val_episode, episode_val_step, score, eps))
 
                 logging.warning(
-                    'Step: {}\tEpoch: {}\tVal Step: {}\tEpisode: {}\tEpisode Step: {}\tVal Score: {:.2f}\tEpsilon: {:.2f}'
-                        .format(step, epoch, val_step, episode, episode_step, score, eps))
+                    'Epoch: {}\tVal Step: {}\tEpoch Val Episode: {}\tEpisode Step: {}\tVal Score: {:.2f}\tEpsilon: {:.2f}'
+                        .format(epoch, val_step, epoch_val_episode, episode_val_step, score, eps))
 
                 if val_step < EVAL_STEPS:
                     val_scores_window.append(score)  # save most recent score
@@ -310,7 +313,7 @@ class Trainer:
                                                                                          np.mean(val_scores_window),
                                                                                          eps))
 
-            epoch_recorder.record([epoch, np.mean(scores_window), np.mean(val_scores_window), eps])
+            epoch_recorder.record([epoch, np.mean(scores_window), np.mean(val_scores_window), eps, np.mean(loss_window)])
             epoch_recorder.save()
 
             model_filename = self.get_model_filename(epoch, np.mean(scores_window), np.mean(val_scores_window), eps )

@@ -60,8 +60,7 @@ class Analyzer:
 
         for path_to_experiment in path_to_experiments:
             path = os.path.join(path_to_experiment, 'epoch-log.csv')
-            
-            print(path)
+
             df = pd.read_csv(path, index_col=0)
             if df.shape[0] > max_x:
                 max_x = df.shape[0]
@@ -94,6 +93,35 @@ class Analyzer:
         Path(path).mkdir(parents=True, exist_ok=True)
 
         path = os.path.join(path, compare_col +'.png' )
+
+        if plot:
+            plt.show()
+            return None
+        else:
+            matplotlib.use('Agg')
+            fig.savefig(path)
+            return path
+
+    def compare_train_epoch_score(self, path_to_experiment, plot=False):
+
+        path = os.path.join(path_to_experiment, 'epoch-log.csv')
+
+        df_tmp = pd.read_csv(path, index_col=0)
+
+        df_tmp = df_tmp[['avg_score', 'avg_val_score']]
+
+        ax = df_tmp.plot()
+
+        ax.set_xlabel('epoch')
+        ax.set_ylabel('score')
+
+        from matplotlib import pyplot
+        fig = ax.get_figure()
+
+        path = os.path.join(self.__config.get_app_analysis_path(), self.__session_id)
+        Path(path).mkdir(parents=True, exist_ok=True)
+
+        path = os.path.join(path, 'score.png' )
         
         if plot:
             plt.show()
@@ -103,7 +131,6 @@ class Analyzer:
             fig.savefig(path)
             return path
 
-        
     def log_analysis(self, analysis: Dict):
         for key in analysis.keys():
             print("{}: {}".format(key, analysis[key]))

@@ -75,8 +75,9 @@ def main():
         logging.debug(params)
 
         config = Config()
+        config.set_current_env(args.env)
         environment = Experiment(config)
-        environment.set_env(args.env)
+        # environment.set_env(args.env)
         # agent = environment.create_agent()
         env = environment.create_env()
         explorer = Explorer(config)
