@@ -2,7 +2,7 @@ import numpy as np
 import random
 from collections import namedtuple, deque
 
-from drl.models.classic.model import QNetwork, QNetworkB, QNetworkA
+from drl.models.classic.model import QNetwork2, QNetwork1
 
 import torch
 import torch.nn.functional as F
@@ -14,8 +14,8 @@ BATCH_SIZE = 64  # minibatch size
 GAMMA = 0.99  # discount factor
 TAU = 1e-3  # for soft update of target parameters
 LR = 5e-4  # learning rate
-LR = 5e-2  # learning rate
-LR = 5e-6  # learning rate
+# LR = 5e-2  # learning rate
+# LR = 5e-6  # learning rate
 UPDATE_EVERY = 4  # how often to update the network
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -38,8 +38,8 @@ class DqnAgent:
         self.seed = random.seed(seed)
 
         # Q-Network
-        self.qnetwork_local = QNetworkA(state_size * num_frames, action_size, seed).to(device)
-        self.qnetwork_target = QNetworkA(state_size * num_frames, action_size, seed).to(device)
+        self.qnetwork_local = QNetwork1(state_size * num_frames, action_size, seed).to(device)
+        self.qnetwork_target = QNetwork1(state_size * num_frames, action_size, seed).to(device)
         self.optimizer = optim.Adam(self.qnetwork_local.parameters(), lr=LR)
 
         # Replay memory
@@ -148,10 +148,10 @@ class DqnAgent:
         loss.backward()
         self.optimizer.step()
 
-        return float(torch.sum(rewards > 0)) / rewards.shape[0], float(torch.sum(rewards < 0)) / rewards.shape[0], loss.item()
-
         # ------------------- update target network ------------------- #
         self.soft_update(self.qnetwork_local, self.qnetwork_target, TAU)
+
+        return float(torch.sum(rewards > 0)) / rewards.shape[0], float(torch.sum(rewards < 0)) / rewards.shape[0], loss.item()
 
     def soft_update(self, local_model, target_model, tau):
         """Soft update model parameters.

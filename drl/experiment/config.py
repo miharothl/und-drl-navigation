@@ -131,6 +131,10 @@ class Config:
                             'eval_steps': 3000,
                             'epsilon': 0.995,
                             'human_flag': False,
+                            'learning_rate': 0.0001,
+                            'tao': 0.001,
+                            'gamma': 0.99,
+                            'neural_network:': [64,64]
                         },
                 },
             'lunarlander-4f': {

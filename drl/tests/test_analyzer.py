@@ -1,5 +1,5 @@
 import pytest
-
+import matplotlib.pyplot as plt
 from drl.experiment.analyser import Analyzer
 from drl.experiment.config import Config
 from drl.experiment.experiment import Experiment
