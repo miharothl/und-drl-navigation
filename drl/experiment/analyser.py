@@ -3,6 +3,8 @@ from pathlib import Path
 
 import pandas as pd
 from typing import Dict
+import matplotlib
+import matplotlib.pyplot as plt
 
 
 from drl.experiment.config import Config
@@ -38,12 +40,16 @@ class Analyzer:
         """
         return analysis
 
-    def compare_train_epoch_cols(self, path_to_experiments, compare_col) -> Dict:
+    def compare_train_epoch_cols(self, path_to_experiments, compare_col, plot):
+
+        print(path_to_experiments)
 
         max_x = 0
 
         for path_to_experiment in path_to_experiments:
             path = os.path.join(path_to_experiment, 'epoch-log.csv')
+            
+            print(path)
             df = pd.read_csv(path, index_col=0)
             if df.shape[0] > max_x:
                 max_x = df.shape[0]
@@ -76,10 +82,16 @@ class Analyzer:
         Path(path).mkdir(parents=True, exist_ok=True)
 
         path = os.path.join(path, compare_col +'.png' )
-        fig.savefig(path)
+        
+        if plot:
+            plt.show()
+            return None
+        else:
+            matplotlib.use('Agg')
+            fig.savefig(path)
+            return path
 
-        return path
-
+        
     def log_analysis(self, analysis: Dict):
         for key in analysis.keys():
             print("{}: {}".format(key, analysis[key]))
