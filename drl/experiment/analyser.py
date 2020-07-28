@@ -1,3 +1,4 @@
+import json
 import os
 from pathlib import Path
 
@@ -40,10 +41,21 @@ class Analyzer:
         """
         return analysis
 
-    def compare_train_epoch_cols(self, path_to_experiments, compare_col, plot):
+    def compare_train_config(self, path_to_experiments):
 
-        print(path_to_experiments)
+        for path_to_experiment in path_to_experiments:
+            path = os.path.join(path_to_experiment, 'config.json')
 
+            with open(path, 'r') as fp:
+                cfg = json.load(fp)
+
+            print(path_to_experiment)
+            print(json.dumps(cfg, indent=4, sort_keys=True))
+
+        pass
+
+
+    def compare_train_epoch_cols(self, path_to_experiments, compare_col, plot=False):
         max_x = 0
 
         for path_to_experiment in path_to_experiments:

@@ -78,7 +78,7 @@ class Experiment:
         if state_rgb:
             agent = DqnAgentRgb(state_size=state_size, action_size=action_size, seed=0, num_frames=num_frames)
         else:
-            agent = DqnAgent(state_size=state_size, action_size=action_size, seed=0, num_frames=num_frames)
+            agent = DqnAgent(state_size=state_size, action_size=action_size, seed=0, num_frames=num_frames, config=self.__config)
 
         return agent
 

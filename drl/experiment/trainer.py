@@ -93,7 +93,9 @@ class Trainer:
             session_id=self.__session_id,
             experiments_path=self.__config.get_app_experiments_path(train_mode=True),
             model=None,
-            log_prefix='epoch-')
+            log_prefix='epoch-',
+            configuration = self.__config.get_current_env_config()
+        )
 
         episode_recorder = Recorder(
             header=['step', 'epoch', 'epoch step', 'episode', 'episode step', 'score', 'epsilon',
@@ -101,7 +103,9 @@ class Trainer:
             session_id=self.__session_id,
             experiments_path=self.__config.get_app_experiments_path(train_mode=True),
             model=None,
-            log_prefix='episode-')
+            log_prefix='episode-',
+            configuration=self.__config.get_current_env_config()
+        )
 
         EVAL_FREQUENCY = eval_frequency
         EVAL_STEPS = eval_steps
@@ -171,7 +175,7 @@ class Trainer:
                     action = action - self.__config.get_current_agent_state_offset()
 
                     if done:
-                        reward += -50
+                        reward += self.__config.get_current_env_terminate_reward()
 
                     pos_reward_ratio, neg_reward_ratio, loss = agent.step(state, action, reward, next_state, done)
 

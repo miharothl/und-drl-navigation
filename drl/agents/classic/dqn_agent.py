@@ -2,6 +2,7 @@ import numpy as np
 import random
 from collections import namedtuple, deque
 
+from drl.experiment.config import Config
 from drl.models.classic.model import QNetwork2, QNetwork1
 
 import torch
@@ -10,12 +11,9 @@ import torch.optim as optim
 
 BUFFER_SIZE = int(1e5)  # replay buffer size
 BATCH_SIZE = 64  # minibatch size
-# BATCH_SIZE = 128  # minibatch size
-GAMMA = 0.99  # discount factor
-TAU = 1e-3  # for soft update of target parameters
-LR = 5e-4  # learning rate
-# LR = 5e-2  # learning rate
-# LR = 5e-6  # learning rate
+# GAMMA = 0.99  # discount factor
+# TAU = 1e-3  # for soft update of target parameters
+# LR = 5e-4  # learning rate
 UPDATE_EVERY = 4  # how often to update the network
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -24,7 +22,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 class DqnAgent:
     """Interacts with and learns from the environment."""
 
-    def __init__(self, state_size, action_size, seed, num_frames=1):
+    def __init__(self, state_size, action_size, seed, config: Config, num_frames=1):
         """Initialize an Agent object.
 
         Params
@@ -33,14 +31,43 @@ class DqnAgent:
             action_size (int): dimension of each action
             seed (int): random seed
         """
+        self.__config = config
+
+        self.__TAU = self.__config.get_current_env_train_tau()
+        self.__LR = self.__config.get_current_env_train_learning_rate()
+        self.__GAMMA = self.__config.get_current_env_train_gamma()
+
         self.state_size = state_size
         self.action_size = action_size
         self.seed = random.seed(seed)
 
+        nn_cfg = self.__config.get_current_env_train_neural_network()
+
+        if len(nn_cfg) == 2:
+            self.qnetwork_local = QNetwork1(state_size * num_frames, action_size, seed,
+                                            fc1_units=nn_cfg[0],
+                                            fc2_units=nn_cfg[1]
+                                            ).to(device)
+
+            self.qnetwork_target = QNetwork1(state_size * num_frames, action_size, seed,
+                                             fc1_units=nn_cfg[0],
+                                             fc2_units=nn_cfg[1]
+                                             ).to(device)
+        elif len(nn_cfg) ==3:
+            self.qnetwork_local = QNetwork2(state_size * num_frames, action_size, seed,
+                                            fc1_units=nn_cfg[0],
+                                            fc2_units=nn_cfg[1],
+                                            fc3_units=nn_cfg[2]).to(device)
+
+            self.qnetwork_target = QNetwork2(state_size * num_frames, action_size, seed,
+                                            fc1_units=nn_cfg[0],
+                                            fc2_units=nn_cfg[1],
+                                            fc3_units=nn_cfg[2]).to(device)
+
         # Q-Network
-        self.qnetwork_local = QNetwork1(state_size * num_frames, action_size, seed).to(device)
-        self.qnetwork_target = QNetwork1(state_size * num_frames, action_size, seed).to(device)
-        self.optimizer = optim.Adam(self.qnetwork_local.parameters(), lr=LR)
+        # self.qnetwork_local = QNetwork1(state_size * num_frames, action_size, seed).to(device)
+        # self.qnetwork_target = QNetwork1(state_size * num_frames, action_size, seed).to(device)
+        self.optimizer = optim.Adam(self.qnetwork_local.parameters(), lr=self.__LR)
 
         # Replay memory
         self.memory = ReplayBuffer(action_size, BUFFER_SIZE, BATCH_SIZE, seed)
@@ -48,6 +75,8 @@ class DqnAgent:
         self.t_step = 0
 
         self.__frames = deque(maxlen=num_frames)
+
+
 
     def preprocess(self, raw_state):
 
@@ -95,7 +124,7 @@ class DqnAgent:
             # If enough samples are available in memory, get random subset and learn
             if len(self.memory) > BATCH_SIZE:
                 experiences = self.memory.sample()
-                pos_reward_ratio, neg_reward_ratio, loss = self.learn(experiences, GAMMA)
+                pos_reward_ratio, neg_reward_ratio, loss = self.learn(experiences, self.__GAMMA)
 
         return (pos_reward_ratio, neg_reward_ratio, loss)
 
@@ -149,7 +178,7 @@ class DqnAgent:
         self.optimizer.step()
 
         # ------------------- update target network ------------------- #
-        self.soft_update(self.qnetwork_local, self.qnetwork_target, TAU)
+        self.soft_update(self.qnetwork_local, self.qnetwork_target, self.__TAU)
 
         return float(torch.sum(rewards > 0)) / rewards.shape[0], float(torch.sum(rewards < 0)) / rewards.shape[0], loss.item()
 

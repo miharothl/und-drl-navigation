@@ -5,13 +5,14 @@ from typing import List, Tuple, Dict
 from pathlib import Path
 
 class Recorder:
-    def __init__(self, header: List, experiments_path,  session_id, model, log_prefix = ''):
+    def __init__(self, header: List, experiments_path,  session_id, model, log_prefix = '', configuration={}):
         self.__header = header
         self.__parameters = []
         self.__session_id = session_id
         self.__model = model
         self.__experiments_path = experiments_path
         self.__log_prefix = log_prefix
+        self.__configuration = configuration
         pass
 
     def get_header(self) -> List:
@@ -39,6 +40,7 @@ class Recorder:
         action_path = os.path.join(session_path, 'config.json')
 
         data = {'session_id': self.__session_id, 'model': self.__model}
+        data['configuration'] = self.__configuration
 
         with open(action_path, 'w') as fp:
             json.dump(data, fp)
