@@ -76,13 +76,15 @@ class DqnAgent:
 
         self.__frames = deque(maxlen=num_frames)
 
+        self.__num_frames = num_frames
+
 
 
     def preprocess(self, raw_state):
 
         if len(self.__frames) == 0:
 
-            for i in range(4):
+            for i in range(self.__num_frames):
                 self.__frames.append(raw_state)
 
         self.__frames.append(raw_state)
