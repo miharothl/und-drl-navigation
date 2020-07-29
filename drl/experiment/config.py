@@ -1260,7 +1260,7 @@ class Config:
                     'start_game_action': 0,
                 },
                 'train': {
-                    'max_steps': 1000000,
+                    'max_steps': 2000000,
                     'max_episode_steps': 2000,
                     'eval_frequency': 20000,
                     'eval_steps': 3000,
@@ -1289,7 +1289,7 @@ class Config:
                     'start_game_action': 0,
                 },
                 'train': {
-                    'max_steps': 1000000,
+                    'max_steps': 2000000,
                     'max_episode_steps': 2000,
                     'eval_frequency': 20000,
                     'eval_steps': 3000,
@@ -1318,7 +1318,7 @@ class Config:
                     'start_game_action': 0,
                 },
                 'train': {
-                    'max_steps': 1000000,
+                    'max_steps': 2000000,
                     'max_episode_steps': 2000,
                     'eval_frequency': 20000,
                     'eval_steps': 3000,
@@ -1521,7 +1521,7 @@ class Config:
                     'start_game_action': 0,
                 },
                 'train': {
-                    'max_steps': 1000000,
+                    'max_steps': 2000000,
                     'max_episode_steps': 2000,
                     'eval_frequency': 20000,
                     'eval_steps': 3000,
@@ -1579,7 +1579,7 @@ class Config:
                     'start_game_action': 0,
                 },
                 'train': {
-                    'max_steps': 1000000,
+                    'max_steps': 2000000,
                     'max_episode_steps': 2000,
                     'eval_frequency': 20000,
                     'eval_steps': 3000,
@@ -1608,7 +1608,7 @@ class Config:
                     'start_game_action': 0,
                 },
                 'train': {
-                    'max_steps': 1000000,
+                    'max_steps': 2000000,
                     'max_episode_steps': 2000,
                     'eval_frequency': 20000,
                     'eval_steps': 3000,
@@ -1637,7 +1637,7 @@ class Config:
                     'start_game_action': 0,
                 },
                 'train': {
-                    'max_steps': 1000000,
+                    'max_steps': 2000000,
                     'max_episode_steps': 2000,
                     'eval_frequency': 20000,
                     'eval_steps': 3000,
