@@ -306,7 +306,7 @@ class Config:
                     'eval_frequency': 20000,
                     'eval_steps': 3000,
                     'epsilon': 0.995,
-                    'human_flag': False,
+                    'human_flag': True,
                     'learning_rate': 0.0001,
                     'tau': 0.001,
                     'gamma': 0.99,

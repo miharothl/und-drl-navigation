@@ -160,7 +160,7 @@ class Trainer:
                     if is_human_flag:
                         env.render(mode='human')
 
-                    next_state, reward, done, info = env.step(action)
+                    next_state, reward, done, new_life = env.step(action)
 
                     # if self.__config.get_current_env_is_atari_flag():
                     #     if info['ale.lives'] > lives:
@@ -269,7 +269,7 @@ class Trainer:
                     if is_human_flag:
                         env.render(mode='human')
 
-                    next_state, reward, done, info = env.step(action)
+                    next_state, reward, done, new_life = env.step(action)
 
                     # if self.__config.get_current_env_is_atari_flag():
                     #     if info['ale.lives'] > lives:
