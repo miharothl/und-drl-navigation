@@ -575,7 +575,6 @@ class Config:
                 },
             },
 
-
             'lunarlander-e61': {
                 'id': 'LunarLander-v2',
                 'env': {
@@ -605,6 +604,7 @@ class Config:
                     'neural_network': [128,64,32]
                 },
             },
+
             'lunarlander-e62': {
                 'id': 'LunarLander-v2',
                 'env': {
@@ -751,9 +751,254 @@ class Config:
                     'gamma': 0.99,
                     'neural_network': [512,256,128]
                 },
+             },
+
+                 'lunarlander-nn09': {
+                     'id': 'LunarLander-v2',
+                     'env': {
+                         'is_atari': False,
+                         'terminate_reward': 0,
+                     },
+                     'agent': {
+                         'action_size': 4,
+                         'state_size': 8,
+                         'discrete': True,
+                         'state_rgb': False,
+                         'num_frames': 1,
+                         'state_offset': 0,
+                         'start_game_action_required': False,
+                         'start_game_action': 0,
+                     },
+                     'train': {
+                         'max_steps': 1000000,
+                         'max_episode_steps': 1000,
+                         'eval_frequency': 20000,
+                         'eval_steps': 3000,
+                         'epsilon': 0.995,
+                         'human_flag': False,
+                         'learning_rate': 0.0001,
+                         'tau': 0.001,
+                         'gamma': 0.99,
+                         'neural_network': [128, 64, 32, 16]
+                     },
+
+                 },
+
+                 'lunarlander-nn10': {
+                     'id': 'LunarLander-v2',
+                     'env': {
+                         'is_atari': False,
+                         'terminate_reward': 0,
+                     },
+                     'agent': {
+                         'action_size': 4,
+                         'state_size': 8,
+                         'discrete': True,
+                         'state_rgb': False,
+                         'num_frames': 1,
+                         'state_offset': 0,
+                         'start_game_action_required': False,
+                         'start_game_action': 0,
+                     },
+                     'train': {
+                         'max_steps': 1000000,
+                         'max_episode_steps': 1000,
+                         'eval_frequency': 20000,
+                         'eval_steps': 3000,
+                         'epsilon': 0.995,
+                         'human_flag': False,
+                         'learning_rate': 0.0001,
+                         'tau': 0.001,
+                         'gamma': 0.99,
+                         'neural_network': [256, 128, 64, 32]
+                     },
+
+                 },
+
+                 'lunarlander-nn11': {
+                     'id': 'LunarLander-v2',
+                     'env': {
+                         'is_atari': False,
+                         'terminate_reward': 0,
+                     },
+                     'agent': {
+                         'action_size': 4,
+                         'state_size': 8,
+                         'discrete': True,
+                         'state_rgb': False,
+                         'num_frames': 1,
+                         'state_offset': 0,
+                         'start_game_action_required': False,
+                         'start_game_action': 0,
+                     },
+                     'train': {
+                         'max_steps': 1000000,
+                         'max_episode_steps': 1000,
+                         'eval_frequency': 20000,
+                         'eval_steps': 3000,
+                         'epsilon': 0.995,
+                         'human_flag': False,
+                         'learning_rate': 0.0001,
+                         'tau': 0.001,
+                         'gamma': 0.99,
+                         'neural_network': [512, 256, 128, 64]
+                     },
+
+                 },
+
+                 'lunarlander-nn12': {
+                     'id': 'LunarLander-v2',
+                     'env': {
+                         'is_atari': False,
+                         'terminate_reward': 0,
+                     },
+                     'agent': {
+                         'action_size': 4,
+                         'state_size': 8,
+                         'discrete': True,
+                         'state_rgb': False,
+                         'num_frames': 1,
+                         'state_offset': 0,
+                         'start_game_action_required': False,
+                         'start_game_action': 0,
+                     },
+                     'train': {
+                         'max_steps': 1000000,
+                         'max_episode_steps': 1000,
+                         'eval_frequency': 20000,
+                         'eval_steps': 3000,
+                         'epsilon': 0.995,
+                         'human_flag': False,
+                         'learning_rate': 0.0001,
+                         'tau': 0.001,
+                         'gamma': 0.99,
+                         'neural_network': [1024, 512, 256, 128]
+                     },
+
+                 },
+
+                 'lunarlander-nn06-eps05': {
+                     'id': 'LunarLander-v2',
+                     'env': {
+                         'is_atari': False,
+                         'terminate_reward': 0,
+                     },
+                     'agent': {
+                         'action_size': 4,
+                         'state_size': 8,
+                         'discrete': True,
+                         'state_rgb': False,
+                         'num_frames': 1,
+                         'state_offset': 0,
+                         'start_game_action_required': False,
+                         'start_game_action': 0,
+                     },
+                     'train': {
+                         'max_steps': 1000000,
+                         'max_episode_steps': 1000,
+                         'eval_frequency': 20000,
+                         'eval_steps': 3000,
+                         'epsilon': 0.997,
+                         'human_flag': False,
+                         'learning_rate': 0.0001,
+                         'tau': 0.001,
+                         'gamma': 0.99,
+                         'neural_network': [128, 64, 32]
+                     },
+                 },
+
+
+            'lunarlander-nn06-eps06': {
+                'id': 'LunarLander-v2',
+                'env': {
+                    'is_atari': False,
+                    'terminate_reward': 0,
+                },
+                'agent': {
+                    'action_size': 4,
+                    'state_size': 8,
+                    'discrete': True,
+                    'state_rgb': False,
+                    'num_frames': 1,
+                    'state_offset': 0,
+                    'start_game_action_required': False,
+                    'start_game_action': 0,
+                },
+                'train': {
+                    'max_steps': 1000000,
+                    'max_episode_steps': 1000,
+                    'eval_frequency': 20000,
+                    'eval_steps': 3000,
+                    'epsilon': 0.998,
+                    'human_flag': False,
+                    'learning_rate': 0.0001,
+                    'tau': 0.001,
+                    'gamma': 0.99,
+                    'neural_network': [128, 64, 32]
+                },
             },
 
-            'lunarlander-4f': {
+            'lunarlander-nn06-eps07': {
+                'id': 'LunarLander-v2',
+                'env': {
+                    'is_atari': False,
+                    'terminate_reward': 0,
+                },
+                'agent': {
+                    'action_size': 4,
+                    'state_size': 8,
+                    'discrete': True,
+                    'state_rgb': False,
+                    'num_frames': 1,
+                    'state_offset': 0,
+                    'start_game_action_required': False,
+                    'start_game_action': 0,
+                },
+                'train': {
+                    'max_steps': 1000000,
+                    'max_episode_steps': 1000,
+                    'eval_frequency': 20000,
+                    'eval_steps': 3000,
+                    'epsilon': 0.999,
+                    'human_flag': False,
+                    'learning_rate': 0.0001,
+                    'tau': 0.001,
+                    'gamma': 0.99,
+                    'neural_network': [128, 64, 32]
+                },
+            },
+
+            'lunarlander-nn06-eps08': {
+                'id': 'LunarLander-v2',
+                'env': {
+                    'is_atari': False,
+                    'terminate_reward': 0,
+                },
+                'agent': {
+                    'action_size': 4,
+                    'state_size': 8,
+                    'discrete': True,
+                    'state_rgb': False,
+                    'num_frames': 1,
+                    'state_offset': 0,
+                    'start_game_action_required': False,
+                    'start_game_action': 0,
+                },
+                'train': {
+                    'max_steps': 1000000,
+                    'max_episode_steps': 1000,
+                    'eval_frequency': 20000,
+                    'eval_steps': 3000,
+                    'epsilon': 0.9991,
+                    'human_flag': False,
+                    'learning_rate': 0.0001,
+                    'tau': 0.001,
+                    'gamma': 0.99,
+                    'neural_network': [128, 64, 32]
+                },
+            },
+
+                 'lunarlander-4f': {
                     'id': 'LunarLander-v2',
                     'env': {
                             'is_atari': False,

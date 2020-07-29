@@ -3,7 +3,7 @@ import random
 from collections import namedtuple, deque
 
 from drl.experiment.config import Config
-from drl.models.classic.model import QNetwork2, QNetwork1
+from drl.models.classic.model import QNetwork2, QNetwork1, QNetwork3
 
 import torch
 import torch.nn.functional as F
@@ -53,16 +53,28 @@ class DqnAgent:
                                              fc1_units=nn_cfg[0],
                                              fc2_units=nn_cfg[1]
                                              ).to(device)
-        elif len(nn_cfg) ==3:
+        elif len(nn_cfg) == 3:
             self.qnetwork_local = QNetwork2(state_size * num_frames, action_size, seed,
                                             fc1_units=nn_cfg[0],
                                             fc2_units=nn_cfg[1],
                                             fc3_units=nn_cfg[2]).to(device)
 
             self.qnetwork_target = QNetwork2(state_size * num_frames, action_size, seed,
+                                             fc1_units=nn_cfg[0],
+                                             fc2_units=nn_cfg[1],
+                                             fc3_units=nn_cfg[2]).to(device)
+        elif len(nn_cfg) == 4:
+            self.qnetwork_local = QNetwork3(state_size * num_frames, action_size, seed,
                                             fc1_units=nn_cfg[0],
                                             fc2_units=nn_cfg[1],
-                                            fc3_units=nn_cfg[2]).to(device)
+                                            fc3_units=nn_cfg[2],
+                                            fc4_units=nn_cfg[3]).to(device)
+
+            self.qnetwork_target = QNetwork3(state_size * num_frames, action_size, seed,
+                                            fc1_units=nn_cfg[0],
+                                            fc2_units=nn_cfg[1],
+                                            fc3_units=nn_cfg[2],
+                                            fc4_units=nn_cfg[3]).to(device)
 
         # Q-Network
         # self.qnetwork_local = QNetwork1(state_size * num_frames, action_size, seed).to(device)
