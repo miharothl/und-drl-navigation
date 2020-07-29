@@ -12,7 +12,8 @@ torch==0.4.0
 pandas
 scipy
 ipykernel
-pyvirtualdisplay
 gym
-torchvision==0.2.0
-unityagents
+ipython
+pytest-depends
+opencv-python
+

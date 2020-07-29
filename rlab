@@ -79,7 +79,7 @@ def main():
         environment = Experiment(config)
         # environment.set_env(args.env)
         # agent = environment.create_agent()
-        env = environment.create_env()
+        # env = environment.create_env()
         explorer = Explorer(config)
         analyzer = Analyzer(config, environment.get_session_id())
 
@@ -121,7 +121,7 @@ def main():
                     num_episodes=args.play_episodes
                 )
 
-        env.close()
+        # env.close()
 
     except Exception as e:
         logging.exception("Something went wrong :-(")
