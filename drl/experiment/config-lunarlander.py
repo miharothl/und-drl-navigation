@@ -159,6 +159,7 @@ class Config:
 
             'lunarlander-e1': {
                 'id': 'LunarLander-v2',
+                'id': 'Breakout-ram-v4',
                 'env': {
                     'is_atari': False,
                     'terminate_reward': 0,
@@ -189,6 +190,7 @@ class Config:
 
             'lunarlander-e2': {
                     'id': 'LunarLander-v2',
+                'id': 'Breakout-ram-v4',
                     'env': {
                             'is_atari': False,
                             'terminate_reward': 0,
@@ -220,6 +222,7 @@ class Config:
 
             'lunarlander-e3': {
                 'id': 'LunarLander-v2',
+                'id': 'Breakout-ram-v4',
                 'env': {
                     'is_atari': False,
                     'terminate_reward': 0,
@@ -1070,34 +1073,34 @@ class Config:
             #             }
             #     },
             'breakout': {
-                   'id': 'Breakout-ram-v4',
-                   'env': {
-                        'is_atari': True,
-                        'terminate_reward': 0,
-                   },
-                   'agent': {
-                           'action_size': 3,
-                           'state_size': 128,
-                           'discrete': True,
-                           'state_rgb': False,
-                           'num_frames': 4,
-                           'state_offset': 1,
-                           'start_game_action_required': True,
-                           'start_game_action': 0,
-                   },
-                   'train': {
-                           'max_steps': 10000,
-                           'max_episode_steps': 2000,
-                           'eval_frequency': 20000,
-                           'eval_steps': 2000,
-                           'epsilon': 0.995,
-                           'human_flag': True,
-                           'learning_rate': 0.0001,
-                           'tau': 0.001,
-                           'gamma': 0.99,
-                           'neural_network': [64,64]
-                   }
-               },
+                'id': 'Breakout-ram-v4',
+                'env': {
+                    'is_atari': True,
+                    'terminate_reward': 0,
+                },
+                'agent': {
+                    'action_size': 3,
+                    'state_size': 128,
+                    'discrete': True,
+                    'state_rgb': False,
+                    'num_frames': 4,
+                    'state_offset': 1,
+                    'start_game_action_required': True,
+                    'start_game_action': 0,
+                },
+                'train': {
+                    'max_steps': 10000,
+                    'max_episode_steps': 2000,
+                    'eval_frequency': 20000,
+                    'eval_steps': 2000,
+                    'epsilon': 0.995,
+                    'human_flag': True,
+                    'learning_rate': 0.0001,
+                    'tau': 0.001,
+                    'gamma': 0.99,
+                    'neural_network': [64,64]
+                }
+            },
             'breakout-nn01': {
                 'id': 'Breakout-ram-v4',
                 'env': {
@@ -1124,7 +1127,7 @@ class Config:
                     'learning_rate': 0.0001,
                     'tau': 0.001,
                     'gamma': 0.99,
-                    'neural_network': [64, 64]
+                    'neural_network': [64,64]
                 }
             },
             'breakout-nn02': {
@@ -1153,7 +1156,7 @@ class Config:
                     'learning_rate': 0.0001,
                     'tau': 0.001,
                     'gamma': 0.99,
-                    'neural_network': [128, 128]
+                    'neural_network': [128,128]
                 }
             },
             'breakout-nn03': {
@@ -1182,7 +1185,7 @@ class Config:
                     'learning_rate': 0.0001,
                     'tau': 0.001,
                     'gamma': 0.99,
-                    'neural_network': [256, 256]
+                    'neural_network': [256,256]
                 }
             },
             'breakout-nn04': {
@@ -1211,7 +1214,7 @@ class Config:
                     'learning_rate': 0.0001,
                     'tau': 0.001,
                     'gamma': 0.99,
-                    'neural_network': [64, 64, 32]
+                    'neural_network': [64,64,32]
                 }
             },
             'breakout-nn05': {
@@ -1240,7 +1243,7 @@ class Config:
                     'learning_rate': 0.0001,
                     'tau': 0.001,
                     'gamma': 0.99,
-                    'neural_network': [128, 128, 64]
+                    'neural_network': [128,128,64]
                 }
             },
             'breakout-nn06': {
@@ -1269,7 +1272,7 @@ class Config:
                     'learning_rate': 0.0001,
                     'tau': 0.001,
                     'gamma': 0.99,
-                    'neural_network': [256, 256, 128]
+                    'neural_network': [256,256,128]
                 }
             },
             'breakout-nn07': {
@@ -1298,7 +1301,7 @@ class Config:
                     'learning_rate': 0.0001,
                     'tau': 0.001,
                     'gamma': 0.99,
-                    'neural_network': [512, 256, 128]
+                    'neural_network': [512,256,128]
                 }
             },
             'breakout-nn08': {
@@ -1327,7 +1330,7 @@ class Config:
                     'learning_rate': 0.0001,
                     'tau': 0.001,
                     'gamma': 0.99,
-                    'neural_network': [128, 128, 64, 64]
+                    'neural_network': [128,128,64,64]
                 }
             },
             'breakout-nn09': {
@@ -1356,7 +1359,7 @@ class Config:
                     'learning_rate': 0.0001,
                     'tau': 0.001,
                     'gamma': 0.99,
-                    'neural_network': [256, 256, 128, 128]
+                    'neural_network': [256,256,128,128]
                 }
             },
             'breakout-nn10': {
@@ -1385,7 +1388,7 @@ class Config:
                     'learning_rate': 0.0001,
                     'tau': 0.001,
                     'gamma': 0.99,
-                    'neural_network': [256, 128, 64, 64]
+                    'neural_network': [256,128,64,64]
                 }
             },
             'breakout-nn11': {
@@ -1414,39 +1417,38 @@ class Config:
                     'learning_rate': 0.0001,
                     'tau': 0.001,
                     'gamma': 0.99,
-                    'neural_network': [512, 256, 128, 64]
+                    'neural_network': [512,256,128,64]
                 }
             },
             'breakout-nn12': {
-                'id': 'Breakout-ram-v4',
-                'env': {
-                    'is_atari': True,
-                    'terminate_reward': 0,
-                },
-                'agent': {
-                    'action_size': 3,
-                    'state_size': 128,
-                    'discrete': True,
-                    'state_rgb': False,
-                    'num_frames': 4,
-                    'state_offset': 1,
-                    'start_game_action_required': True,
-                    'start_game_action': 0,
-                },
-                'train': {
-                    'max_steps': 1000000,
-                    'max_episode_steps': 2000,
-                    'eval_frequency': 20000,
-                    'eval_steps': 3000,
-                    'epsilon': 0.995,
-                    'human_flag': True,
-                    'learning_rate': 0.0001,
-                    'tau': 0.001,
-                    'gamma': 0.99,
-                    'neural_network': [1024, 512, 256, 128]
-                }
-            },
-
+                   'id': 'Breakout-ram-v4',
+                   'env': {
+                        'is_atari': True,
+                        'terminate_reward': 0,
+                   },
+                   'agent': {
+                           'action_size': 3,
+                           'state_size': 128,
+                           'discrete': True,
+                           'state_rgb': False,
+                           'num_frames': 4,
+                           'state_offset': 1,
+                           'start_game_action_required': True,
+                           'start_game_action': 0,
+                   },
+                   'train': {
+                           'max_steps': 1000000,
+                           'max_episode_steps': 2000,
+                           'eval_frequency': 20000,
+                           'eval_steps': 3000,
+                           'epsilon': 0.995,
+                           'human_flag': True,
+                           'learning_rate': 0.0001,
+                           'tau': 0.001,
+                           'gamma': 0.99,
+                           'neural_network': [1024,512,256,128]
+                   }
+               },
             'spaceinvaders': {
                     'id': 'SpaceInvaders-ram-v0',
                     'env': {
