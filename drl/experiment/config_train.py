@@ -1079,7 +1079,7 @@ class Config:
                             'max_episode_steps': 1000,
                             'eval_frequency': 5000,
                             'eval_steps': 500,
-                            'epsilon': 0.99995,
+                            'epsilon': 0.995,
                             'human_flag': False,
                             'learning_rate': 0.0001,
                             'tau': 0.001,

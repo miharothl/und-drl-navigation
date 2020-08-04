@@ -63,7 +63,7 @@ class Trainer:
                    eval_steps=10000,
                    is_human_flag=False,
                    eps_start=1.0,
-                   eps_end=0.15,
+                   eps_end=0.01,
                    eps_decay=0.9990, terminate_soore=800.0):
         """Deep Q-Learning.
 
@@ -89,7 +89,7 @@ class Trainer:
             eps = 0.78
 
         epoch_recorder = Recorder(
-            header=['epoch', 'avg_score', 'avg_val_score', 'epsilon', 'avg_loss'],
+            header=['epoch', 'avg_score', 'avg_val_score', 'epsilon', 'avg_loss', 'beta'],
             session_id=self.__session_id,
             experiments_path=self.__config.get_app_experiments_path(train_mode=True),
             model=None,
@@ -98,7 +98,7 @@ class Trainer:
         )
 
         episode_recorder = Recorder(
-            header=['step', 'episode', 'epoch', 'epoch step', 'epoch_episode', 'episode step', 'score', 'epsilon',
+            header=['step', 'episode', 'epoch', 'epoch step', 'epoch_episode', 'episode step', 'score', 'epsilon', 'beta',
                     'avg_pos_reward_ratio', 'avg_neg_reward_ratio', 'avg_loss'],
             session_id=self.__session_id,
             experiments_path=self.__config.get_app_experiments_path(train_mode=True),
@@ -178,7 +178,7 @@ class Trainer:
                     # if done:
                     #     reward += self.__config.get_current_env_terminate_reward()
 
-                    pos_reward_ratio, neg_reward_ratio, loss = agent.step(state, action, reward, next_state, done)
+                    pos_reward_ratio, neg_reward_ratio, loss, beta = agent.step(state, action, reward, next_state, done)
 
                     if loss is not None:
                         loss_window.append(loss)
@@ -209,7 +209,7 @@ class Trainer:
                                 np.mean(neg_reward_ratio_window) if len(neg_reward_ratio_window) > 0 else 0,
                                 np.mean(loss_window) if len(loss_window) > 0 else 0))
 
-                episode_recorder.record([step, episode, epoch, epoch_step, epoch_episode, episode_step, score, eps,
+                episode_recorder.record([step, episode, epoch, epoch_step, epoch_episode, episode_step, score, eps, beta,
                                          np.mean(pos_reward_ratio_window) if len(pos_reward_ratio_window) > 0 else 0,
                                          np.mean(neg_reward_ratio_window) if len(neg_reward_ratio_window) > 0 else 0,
                                          np.mean(loss_window) if len(loss_window) > 0 else 0])
@@ -313,7 +313,7 @@ class Trainer:
                                                                                          np.mean(val_scores_window),
                                                                                          eps))
 
-            epoch_recorder.record([epoch, np.mean(scores_window), np.mean(val_scores_window), eps, np.mean(loss_window)])
+            epoch_recorder.record([epoch, np.mean(scores_window), np.mean(val_scores_window), eps, np.mean(loss_window), beta])
             epoch_recorder.save()
 
             model_filename = self.get_model_filename(epoch, np.mean(scores_window), np.mean(val_scores_window), eps )

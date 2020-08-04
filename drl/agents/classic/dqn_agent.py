@@ -2,6 +2,9 @@ import numpy as np
 import random
 from collections import namedtuple, deque
 
+from drl.agents.replay_buffer import ReplayBuffer, PrioritizedReplayBuffer
+from drl.agents.replay_buffer_udacity import ReplayBufferUdacity
+from drl.agents.schedules import LinearSchedule
 from drl.experiment.config import Config
 from drl.models.classic.model import QNetwork2, QNetwork1, QNetwork3
 
@@ -71,10 +74,10 @@ class DqnAgent:
                                             fc4_units=nn_cfg[3]).to(device)
 
             self.qnetwork_target = QNetwork3(state_size * num_frames, action_size, seed,
-                                            fc1_units=nn_cfg[0],
-                                            fc2_units=nn_cfg[1],
-                                            fc3_units=nn_cfg[2],
-                                            fc4_units=nn_cfg[3]).to(device)
+                                             fc1_units=nn_cfg[0],
+                                             fc2_units=nn_cfg[1],
+                                             fc3_units=nn_cfg[2],
+                                             fc4_units=nn_cfg[3]).to(device)
 
         # Q-Network
         # self.qnetwork_local = QNetwork1(state_size * num_frames, action_size, seed).to(device)
@@ -82,15 +85,35 @@ class DqnAgent:
         self.optimizer = optim.Adam(self.qnetwork_local.parameters(), lr=self.__LR)
 
         # Replay memory
-        self.memory = ReplayBuffer(action_size, BUFFER_SIZE, BATCH_SIZE, seed)
+        # PRB
+        # self.memory = ReplayBufferUdacity(action_size, BUFFER_SIZE, BATCH_SIZE, seed)
+        # Create the replay buffer
+        self.prioritized_replay = True
+        prioritized_replay_alpha = 0.6
+        prioritized_replay_beta_iters = None
+        total_timesteps = self.__config.get_current_env_train_max_steps()
+        prioritized_replay_beta0 = 0.4
+        self.prioritized_replay_eps = 1e-6
+
+        if self.prioritized_replay:
+            self.memory = PrioritizedReplayBuffer(BUFFER_SIZE, alpha=prioritized_replay_alpha)
+            if prioritized_replay_beta_iters is None:
+                prioritized_replay_beta_iters = total_timesteps
+            self.beta_schedule = LinearSchedule(prioritized_replay_beta_iters,
+                                           initial_p=prioritized_replay_beta0,
+                                           final_p=1.0)
+        else:
+            self.memory = ReplayBuffer(BUFFER_SIZE)
+            self.beta_schedule = None
+
+        self.step_i = 0
+
         # Initialize time step (for updating every UPDATE_EVERY steps)
         self.t_step = 0
 
         self.__frames = deque(maxlen=num_frames)
 
         self.__num_frames = num_frames
-
-
 
     def preprocess(self, raw_state):
 
@@ -132,15 +155,39 @@ class DqnAgent:
         neg_reward_ratio = None
         loss = None
 
+        beta = None
+
+
+
         # Learn every UPDATE_EVERY time steps.
         self.t_step = (self.t_step + 1) % UPDATE_EVERY
         if self.t_step == 0:
             # If enough samples are available in memory, get random subset and learn
             if len(self.memory) > BATCH_SIZE:
-                experiences = self.memory.sample()
-                pos_reward_ratio, neg_reward_ratio, loss = self.learn(experiences, self.__GAMMA)
+                # PRB
+                # experiences = self.memory.sample()
 
-        return (pos_reward_ratio, neg_reward_ratio, loss)
+                if self.prioritized_replay:
+
+                    beta =  self.beta_schedule.value(self.step_i)
+                    experience = self.memory.sample(BATCH_SIZE, beta=beta)
+                    (obses_t, actions, rewards, obses_tp1, dones, weights, batch_idxes) = experience
+                    exp = (obses_t, actions, rewards, obses_tp1, dones, weights)
+                else:
+                    experiences = self.memory.sample(BATCH_SIZE)
+                    obses_t, actions, rewards, obses_tp1, dones = experiences
+                    weights, batch_idxes = np.ones_like(rewards), None
+                    exp = (obses_t, actions, rewards, obses_tp1, dones, weights)
+
+                pos_reward_ratio, neg_reward_ratio, loss, td_error = self.learn(exp, self.__GAMMA)
+
+                if self.prioritized_replay:
+                    new_priorities = np.abs(td_error) + self.prioritized_replay_eps
+                    self.memory.update_priorities(batch_idxes, new_priorities)
+
+        self.step_i += 1
+
+        return (pos_reward_ratio, neg_reward_ratio, loss, beta)
 
     def act(self, state, eps=0.):
         """Returns actions for given state as per current policy.
@@ -173,18 +220,87 @@ class DqnAgent:
             experiences (Tuple[torch.Variable]): tuple of (s, a, r, s', done) tuples
             gamma (float): discount factor
         """
-        states, actions, rewards, next_states, dones = experiences
+        states, actions, rewards, next_states, dones, weights = experiences
 
-        # Get max predicted Q values (for next states) from target model
-        Q_targets_next = self.qnetwork_target(next_states).detach().max(1)[0].unsqueeze(1)
-        # Compute Q targets for current states
-        Q_targets = rewards + (gamma * Q_targets_next * (1 - dones))
+        # # PRB
+        # states = torch.from_numpy(states).float()
+        # actions = torch.from_numpy(actions).long()
+        # actions = actions.unsqueeze(1)
+        # rewards = torch.from_numpy(rewards).float()
+        # rewards = rewards.unsqueeze(1)
+        # next_states = torch.from_numpy(next_states).float()
+        # dones = torch.from_numpy(dones.astype(np.uint8)).float()
+        # dones = dones.unsqueeze(1)
+        #
+        # # print(weights.shape)
+        # weights = torch.from_numpy(weights).float()
+        # weights = weights.unsqueeze(1)
+        #
+        # # Get max predicted Q values (for next states) from target model
+        # Q_targets_next = self.qnetwork_target(next_states).detach().max(1)[0].unsqueeze(1)
+        # # Compute Q targets for current states
+        # Q_targets = rewards + (gamma * Q_targets_next * (1 - dones))
+        #
+        # # Get expected Q values from local model
+        # Q_expected = self.qnetwork_local(states).gather(1, actions)
+        #
+        # # Compute loss
+        # # loss = F.mse_loss(Q_expected, Q_targets)
+        #
+        # #  PER
+        # # loss = (torch.FloatTensor(weights) * F.mse_loss(q_expected, q_targets)).mean()
+        # # loss = (torch.FloatTensor(weights) * 100000 * F.smooth_l1_loss(Q_expected, Q_targets)).mean()
+        #
+        # loss = (Q_expected - Q_targets).pow(2) * weights
+        #
+        # td_error = loss
+        # td_error = td_error.squeeze(1)
+        # td_error = td_error.detach().numpy()
+        #
+        # loss = loss.mean()
 
-        # Get expected Q values from local model
-        Q_expected = self.qnetwork_local(states).gather(1, actions)
+        # PRB
+        states = torch.from_numpy(states).float()
+        actions = torch.from_numpy(actions).long()
+        actions = actions.unsqueeze(1)
+        rewards = torch.from_numpy(rewards).float()
+        rewards = rewards.unsqueeze(1)
+        next_states = torch.from_numpy(next_states).float()
+        dones = torch.from_numpy(dones.astype(np.uint8)).float()
+        dones = dones.unsqueeze(1)
+
+        # print(weights.shape)
+        weights = torch.from_numpy(weights).float()
+        weights = weights.unsqueeze(1)
+
+        q_values = self.qnetwork_local(states)
+        next_q_values = self.qnetwork_local(next_states)
+        next_q_state_values = self.qnetwork_target(next_states)
+
+        q_value = q_values.gather(1, actions).squeeze(1)
+        next_q_value = next_q_state_values.gather(1, torch.max(next_q_values, 1)[1].unsqueeze(1)).squeeze(1)
+
+        q_value = q_value.unsqueeze(1)
+        next_q_value = next_q_value.unsqueeze(1)
+
+        expected_q_value = rewards + gamma * next_q_value * (1 - dones)
+
+        loss = (q_value - expected_q_value).pow(2) * weights
 
         # Compute loss
-        loss = F.mse_loss(Q_expected, Q_targets)
+        # loss = F.mse_loss(Q_expected, Q_targets)
+
+        #  PER
+        # loss = (torch.FloatTensor(weights) * F.mse_loss(q_expected, q_targets)).mean()
+        # loss = (torch.FloatTensor(weights) * 100000 * F.smooth_l1_loss(Q_expected, Q_targets)).mean()
+
+        # loss = (Q_expected - Q_targets).pow(2) * weights
+
+        td_error = loss
+        td_error = td_error.squeeze(1)
+        td_error = td_error.detach().numpy()
+
+        loss = loss.mean()
 
         # Minimize the loss
         self.optimizer.zero_grad()
@@ -194,7 +310,8 @@ class DqnAgent:
         # ------------------- update target network ------------------- #
         self.soft_update(self.qnetwork_local, self.qnetwork_target, self.__TAU)
 
-        return float(torch.sum(rewards > 0)) / rewards.shape[0], float(torch.sum(rewards < 0)) / rewards.shape[0], loss.item()
+        return float(torch.sum(rewards > 0)) / rewards.shape[0], float(torch.sum(rewards < 0)) / rewards.shape[
+            0], loss.item(), td_error
 
     def soft_update(self, local_model, target_model, tau):
         """Soft update model parameters.
@@ -208,49 +325,3 @@ class DqnAgent:
         """
         for target_param, local_param in zip(target_model.parameters(), local_model.parameters()):
             target_param.data.copy_(tau * local_param.data + (1.0 - tau) * target_param.data)
-
-
-class ReplayBuffer:
-    """Fixed-size buffer to store experience tuples."""
-
-    def __init__(self, action_size, buffer_size, batch_size, seed):
-        """Initialize a ReplayBuffer object.
-
-        Params
-        ======
-            action_size (int): dimension of each action
-            buffer_size (int): maximum size of buffer
-            batch_size (int): size of each training batch
-            seed (int): random seed
-        """
-        self.action_size = action_size
-        self.memory = deque(maxlen=buffer_size)
-        self.batch_size = batch_size
-        self.experience = namedtuple("Experience", field_names=["state", "action", "reward", "next_state", "done"])
-        self.seed = random.seed(seed)
-
-    def add(self, state, action, reward, next_state, done):
-        # state = self.preprocess(state)
-        # next_state = self.preprocess(next_state)
-
-        """Add a new experience to memory."""
-        e = self.experience(state, action, reward, next_state, done)
-        self.memory.append(e)
-
-    def sample(self):
-        """Randomly sample a batch of experiences from memory."""
-        experiences = random.sample(self.memory, k=self.batch_size)
-
-        states = torch.from_numpy(np.vstack([e.state for e in experiences if e is not None])).float().to(device)
-        actions = torch.from_numpy(np.vstack([e.action for e in experiences if e is not None])).long().to(device)
-        rewards = torch.from_numpy(np.vstack([e.reward for e in experiences if e is not None])).float().to(device)
-        next_states = torch.from_numpy(np.vstack([e.next_state for e in experiences if e is not None])).float().to(
-            device)
-        dones = torch.from_numpy(np.vstack([e.done for e in experiences if e is not None]).astype(np.uint8)).float().to(
-            device)
-
-        return (states, actions, rewards, next_states, dones)
-
-    def __len__(self):
-        """Return the current size of internal memory."""
-        return len(self.memory)

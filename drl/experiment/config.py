@@ -224,11 +224,11 @@ class Config:
 
             'banana':
                 {
-                     'id': 'banana',
+                    'id': 'banana',
                     'env': {
                         'type': 'unity',
                         'is_atari': False,
-                        'terminate_reward': -50,
+                        'terminate_reward': 0,
                     },
                     'agent': {
                             'action_size': 4,
@@ -241,11 +241,11 @@ class Config:
                             'start_game_action': 0,
                         },
                     'train': {
-                            'max_steps': 1000000,
+                            'max_steps':   600000,
                             'max_episode_steps': 1000,
-                            'eval_frequency': 5000,
-                            'eval_steps': 500,
-                            'epsilon': 0.99995,
+                            'eval_frequency': 10200,
+                            'eval_steps': 2100,
+                            'epsilon': 0.995,
                             'human_flag': False,
                             'learning_rate': 0.0001,
                             'tau': 0.001,
@@ -253,7 +253,105 @@ class Config:
                             'neural_network': [64,64]
                         }
                 },
-            'breakout': {
+
+            'banana-nn01':
+                {
+                     'id': 'banana',
+                    'env': {
+                        'type': 'unity',
+                        'is_atari': False,
+                        'terminate_reward': 0,
+                    },
+                    'agent': {
+                            'action_size': 4,
+                            'state_size': 37,
+                            'discrete': True,
+                            'state_rgb': False,
+                            'num_frames': 1,
+                            'state_offset': 0,
+                            'start_game_action_required': False,
+                            'start_game_action': 0,
+                        },
+                    'train': {
+                            'max_steps': 500000,
+                            'max_episode_steps': 1000,
+                            'eval_frequency': 10000,
+                            'eval_steps': 2000,
+                            'epsilon': 0.995,
+                            'human_flag': False,
+                            'learning_rate': 0.0001,
+                            'tau': 0.001,
+                            'gamma': 0.99,
+                            'neural_network': [128,64]
+                        }
+                },
+
+            'banana-nn02':
+                {
+                    'id': 'banana',
+                    'env': {
+                        'type': 'unity',
+                        'is_atari': False,
+                        'terminate_reward': 0,
+                    },
+                    'agent': {
+                        'action_size': 4,
+                        'state_size': 37,
+                        'discrete': True,
+                        'state_rgb': False,
+                        'num_frames': 1,
+                        'state_offset': 0,
+                        'start_game_action_required': False,
+                        'start_game_action': 0,
+                    },
+                    'train': {
+                        'max_steps': 500000,
+                        'max_episode_steps': 1000,
+                        'eval_frequency': 10000,
+                        'eval_steps': 2000,
+                        'epsilon': 0.995,
+                        'human_flag': False,
+                        'learning_rate': 0.0001,
+                        'tau': 0.001,
+                        'gamma': 0.99,
+                        'neural_network': [128,64,32]
+                    }
+                },
+
+
+            'banana-nn03':
+                {
+                     'id': 'banana',
+                    'env': {
+                        'type': 'unity',
+                        'is_atari': False,
+                        'terminate_reward': 0,
+                    },
+                    'agent': {
+                            'action_size': 4,
+                            'state_size': 37,
+                            'discrete': True,
+                            'state_rgb': False,
+                            'num_frames': 1,
+                            'state_offset': 0,
+                            'start_game_action_required': False,
+                            'start_game_action': 0,
+                        },
+                    'train': {
+                            'max_steps': 500000,
+                            'max_episode_steps': 1000,
+                            'eval_frequency': 10000,
+                            'eval_steps': 2000,
+                            'epsilon': 0.995,
+                            'human_flag': False,
+                            'learning_rate': 0.0001,
+                            'tau': 0.001,
+                            'gamma': 0.99,
+                            'neural_network': [256,128,64,32]
+                        }
+                },
+
+                'breakout': {
                    'id': 'Breakout-ram-v4',
                    'env': {
                         'type': 'gym_atari',
@@ -306,7 +404,7 @@ class Config:
                     'eval_frequency': 20000,
                     'eval_steps': 3000,
                     'epsilon': 0.995,
-                    'human_flag': True,
+                    'human_flag': False,
                     'learning_rate': 0.0001,
                     'tau': 0.001,
                     'gamma': 0.99,

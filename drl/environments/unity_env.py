@@ -37,7 +37,7 @@ class UnityEnv(Environment):
         brain_name = self.__env.brain_names[0]
         # brain = self.__env.brains[brain_name]
 
-        env_info = self.__env.reset(train_mode=False)[brain_name]  # reset the environment
+        env_info = self.__env.reset(train_mode=True)[brain_name]  # reset the environment
         state = env_info.vector_observations[0]  # get the current state
 
         new_life = True
