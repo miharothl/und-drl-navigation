@@ -224,7 +224,7 @@ class Config:
 
             'banana':
                 {
-                    'id': 'banana',
+                    'id': 'env/unity/mac/banana',
                     'env': {
                         'type': 'unity',
                         'is_atari': False,

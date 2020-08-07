@@ -1,16 +1,15 @@
 import numpy as np
 import random
-from collections import namedtuple, deque
+from collections import deque
 
 from drl.agents.replay_buffer import ReplayBuffer, PrioritizedReplayBuffer
-from drl.agents.replay_buffer_udacity import ReplayBufferUdacity
 from drl.agents.schedules import LinearSchedule
 from drl.experiment.config import Config
-from drl.models.classic.model import QNetwork2, QNetwork1, QNetwork3
 
 import torch
-import torch.nn.functional as F
 import torch.optim as optim
+
+from drl.models.model_factory import ModelFactory
 
 BUFFER_SIZE = int(1e5)  # replay buffer size
 BATCH_SIZE = 64  # minibatch size
@@ -46,43 +45,19 @@ class DqnAgent:
 
         nn_cfg = self.__config.get_current_env_train_neural_network()
 
-        if len(nn_cfg) == 2:
-            self.qnetwork_local = QNetwork1(state_size * num_frames, action_size, seed,
-                                            fc1_units=nn_cfg[0],
-                                            fc2_units=nn_cfg[1]
-                                            ).to(device)
+        dueling = True
 
-            self.qnetwork_target = QNetwork1(state_size * num_frames, action_size, seed,
-                                             fc1_units=nn_cfg[0],
-                                             fc2_units=nn_cfg[1]
-                                             ).to(device)
-        elif len(nn_cfg) == 3:
-            self.qnetwork_local = QNetwork2(state_size * num_frames, action_size, seed,
-                                            fc1_units=nn_cfg[0],
-                                            fc2_units=nn_cfg[1],
-                                            fc3_units=nn_cfg[2]).to(device)
-
-            self.qnetwork_target = QNetwork2(state_size * num_frames, action_size, seed,
-                                             fc1_units=nn_cfg[0],
-                                             fc2_units=nn_cfg[1],
-                                             fc3_units=nn_cfg[2]).to(device)
-        elif len(nn_cfg) == 4:
-            self.qnetwork_local = QNetwork3(state_size * num_frames, action_size, seed,
-                                            fc1_units=nn_cfg[0],
-                                            fc2_units=nn_cfg[1],
-                                            fc3_units=nn_cfg[2],
-                                            fc4_units=nn_cfg[3]).to(device)
-
-            self.qnetwork_target = QNetwork3(state_size * num_frames, action_size, seed,
-                                             fc1_units=nn_cfg[0],
-                                             fc2_units=nn_cfg[1],
-                                             fc3_units=nn_cfg[2],
-                                             fc4_units=nn_cfg[3]).to(device)
+        self.current_model, self.target_model = ModelFactory.create(
+            type='classic',
+            fc_units=nn_cfg,
+            num_frames=num_frames,
+            state_size=state_size,
+            action_size=action_size,
+            dueling=dueling,
+            seed=seed)
 
         # Q-Network
-        # self.qnetwork_local = QNetwork1(state_size * num_frames, action_size, seed).to(device)
-        # self.qnetwork_target = QNetwork1(state_size * num_frames, action_size, seed).to(device)
-        self.optimizer = optim.Adam(self.qnetwork_local.parameters(), lr=self.__LR)
+        self.optimizer = optim.Adam(self.current_model.parameters(), lr=self.__LR)
 
         # Replay memory
         # PRB
@@ -100,8 +75,8 @@ class DqnAgent:
             if prioritized_replay_beta_iters is None:
                 prioritized_replay_beta_iters = total_timesteps
             self.beta_schedule = LinearSchedule(prioritized_replay_beta_iters,
-                                           initial_p=prioritized_replay_beta0,
-                                           final_p=1.0)
+                                                initial_p=prioritized_replay_beta0,
+                                                final_p=1.0)
         else:
             self.memory = ReplayBuffer(BUFFER_SIZE)
             self.beta_schedule = None
@@ -110,7 +85,6 @@ class DqnAgent:
 
         # Initialize time step (for updating every UPDATE_EVERY steps)
         self.t_step = 0
-
         self.__frames = deque(maxlen=num_frames)
 
         self.__num_frames = num_frames
@@ -157,8 +131,6 @@ class DqnAgent:
 
         beta = None
 
-
-
         # Learn every UPDATE_EVERY time steps.
         self.t_step = (self.t_step + 1) % UPDATE_EVERY
         if self.t_step == 0:
@@ -169,7 +141,7 @@ class DqnAgent:
 
                 if self.prioritized_replay:
 
-                    beta =  self.beta_schedule.value(self.step_i)
+                    beta = self.beta_schedule.value(self.step_i)
                     experience = self.memory.sample(BATCH_SIZE, beta=beta)
                     (obses_t, actions, rewards, obses_tp1, dones, weights, batch_idxes) = experience
                     exp = (obses_t, actions, rewards, obses_tp1, dones, weights)
@@ -200,10 +172,10 @@ class DqnAgent:
         state = self.preprocess(state)
 
         state = torch.from_numpy(state).float().unsqueeze(0).to(device)
-        self.qnetwork_local.eval()
+        self.current_model.eval()
         with torch.no_grad():
-            action_values = self.qnetwork_local(state)
-        self.qnetwork_local.train()
+            action_values = self.current_model(state)
+        self.current_model.train()
 
         # Epsilon-greedy action selection
         if random.random() > eps:
@@ -273,12 +245,22 @@ class DqnAgent:
         weights = torch.from_numpy(weights).float()
         weights = weights.unsqueeze(1)
 
-        q_values = self.qnetwork_local(states)
-        next_q_values = self.qnetwork_local(next_states)
-        next_q_state_values = self.qnetwork_target(next_states)
+        double_dqn = False
 
-        q_value = q_values.gather(1, actions).squeeze(1)
-        next_q_value = next_q_state_values.gather(1, torch.max(next_q_values, 1)[1].unsqueeze(1)).squeeze(1)
+        if double_dqn:
+            q_values = self.current_model(states)
+            next_q_values = self.current_model(next_states)
+            next_q_state_values = self.target_model(next_states)
+
+            q_value = q_values.gather(1, actions).squeeze(1)
+
+            next_q_value = next_q_state_values.gather(1, torch.max(next_q_values, 1)[1].unsqueeze(1)).squeeze(1)
+        else:  # dqn, dueling
+            q_values = self.current_model(states)
+            next_q_values = self.target_model(next_states)
+
+            q_value = q_values.gather(1, actions).squeeze(1)
+            next_q_value = next_q_values.max(1)[0]
 
         q_value = q_value.unsqueeze(1)
         next_q_value = next_q_value.unsqueeze(1)
@@ -308,7 +290,7 @@ class DqnAgent:
         self.optimizer.step()
 
         # ------------------- update target network ------------------- #
-        self.soft_update(self.qnetwork_local, self.qnetwork_target, self.__TAU)
+        self.soft_update(self.current_model, self.target_model, self.__TAU)
 
         return float(torch.sum(rewards > 0)) / rewards.shape[0], float(torch.sum(rewards < 0)) / rewards.shape[
             0], loss.item(), td_error
