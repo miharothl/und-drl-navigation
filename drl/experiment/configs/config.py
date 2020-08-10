@@ -92,6 +92,7 @@ class Config:
     def get_current_agent_number_frames_flag(self):
         return self.__env[self.__current_env]['agent']['num_frames']
 
+
     def get_app_analysis_path(self, train_mode=True):
 
         if self.__test:
@@ -130,95 +131,128 @@ class Config:
 
     def __set_env_config(self):
         config = {
-            'lunarlander':
-                {
+            'lunarlander': {
                     'id': 'LunarLander-v2',
                     'env': {
-                        'type': 'gym_standard',
-                        'is_atari': False,
-                        'terminate_reward': 0,
+                            'type': 'gym_standard',
+                            'is_atari': False,
+                            'terminate_reward': 0,
                         },
                     'agent': {
-                        'action_size': 4,
-                        'state_size': 8,
-                        'discrete': True,
-                        'state_rgb': False,
-                        'num_frames': 1,
-                        'state_offset': 0,
-                        'start_game_action_required': False,
-                        'start_game_action': 0,
+                            'action_size': 4,
+                            'state_size': 8,
+                            'discrete': True,
+                            'state_rgb': False,
+                            'num_frames': 1,
+                            'state_offset': 0,
+                            'start_game_action_required': False,
+                            'start_game_action': 0,
                         },
                     'train': {
-                        'max_steps': 1000000,
-                        'max_episode_steps': 1000,
-                        'eval_frequency': 20000,
-                        'eval_steps': 3000,
-                        'epsilon': 0.995,
-                        'human_flag': False,
-                        'batch_size': 64,
-                        'update_every': 4,
-                        'learning_rate': 0.0001,
-                        'tau': 0.001,
-                        'gamma': 0.99,
-                    },
-                    'neural_network': {
-                        'hidden_layers': [64, 64],
-                        'dueling': True,
-                        'double': False,
-                    },
-                    'replay_memory': {
-                        'buffer_size': 100000,
-                        'prioritized_replay': True,
-                        'prioritized_replay_alpha': 0.6,
-                        'prioritized_replay_beta0': 0.4,
-                        'prioritized_replay_eps': 1e-6
-                    }
+                            'max_steps': 1000000,
+                            'max_episode_steps': 1000,
+                            'eval_frequency': 20000,
+                            'eval_steps': 3000,
+                            'epsilon': 0.995,
+                            'human_flag': False,
+                            'learning_rate': 0.0001,
+                            'tau': 0.001,
+                            'gamma': 0.99,
+                            'neural_network': [64,64]
+                        },
                 },
-            'banana':
-                {
-                    'id': 'Banana.app',
+            'cartpole': {
+                    'id': 'CartPole-v1',
                     'env': {
-                        'type': 'unity',
+                        'type': 'gym_standard',
                         'is_atari': False,
                         'terminate_reward': -50,
                     },
                     'agent': {
-                        'action_size': 4,
-                        'state_size': 37,
-                        'discrete': True,
-                        'state_rgb': False,
-                        'num_frames': 1,
-                        'state_offset': 0,
-                        'start_game_action_required': False,
-                        'start_game_action': 0,
-                    },
+                            'action_size': 2,
+                            'state_size': 4,
+                            'discrete': True,
+                            'state_rgb': False,
+                            'num_frames': 5,
+                            'state_offset': 0,
+                            'start_game_action_required': False,
+                            'start_game_action': 0,
+                        },
                     'train': {
-                        'max_steps': 1000000,
-                        'max_episode_steps': 1000,
-                        'eval_frequency': 5000,
-                        'eval_steps': 500,
-                        'epsilon': 0.99995,
-                        'human_flag': False,
-                        'batch_size': 64,
-                        'update_every': 4,
-                        'learning_rate': 0.0001,
-                        'tau': 0.001,
-                        'gamma': 0.99,
-                    },
-                    'neural_network': {
-                        'hidden_layers': [64, 64],
-                        'dueling': True,
-                        'double': False,
-                    },
-                    'replay_memory': {
-                        'buffer_size': 100000,
-                        'prioritized_replay': True,
-                        'prioritized_replay_alpha': 0.6,
-                        'prioritized_replay_beta0': 0.4,
-                        'prioritized_replay_eps': 1e-6
-                    }
+                            'max_steps': 1000000,
+                            'max_episode_steps': 1000,
+                            'eval_frequency': 5000,
+                            'eval_steps': 500,
+                            'epsilon': 0.99995,
+                            'human_flag': False,
+                            'learning_rate': 0.0001,
+                            'tau': 0.001,
+                            'gamma': 0.99,
+                            'neural_network': [64,64]
+                        }
                 },
-       }
+            'banana':
+                {
+                    'id': 'env/unity/mac/banana',
+                    'env': {
+                        'type': 'unity',
+                        'is_atari': False,
+                        'terminate_reward': 0,
+                    },
+                    'agent': {
+                            'action_size': 4,
+                            'state_size': 37,
+                            'discrete': True,
+                            'state_rgb': False,
+                            'num_frames': 1,
+                            'state_offset': 0,
+                            'start_game_action_required': False,
+                            'start_game_action': 0,
+                        },
+                    'train': {
+                            'max_steps':   600000,
+                            'max_episode_steps': 1000,
+                            'eval_frequency': 10200,
+                            'eval_steps': 2100,
+                            'epsilon': 0.995,
+                            'human_flag': False,
+                            'learning_rate': 0.0001,
+                            'tau': 0.001,
+                            'gamma': 0.99,
+                            'neural_network': [64,64]
+                        }
+                },
+            'breakout': {
+                'id': 'Breakout-ram-v4',
+                'env': {
+                    'type': 'gym_atari',
+                    'is_atari': True,
+                    'terminate_reward': 0,
+                },
+                'agent': {
+                    'action_size': 3,
+                    'state_size': 128,
+                    'discrete': True,
+                    'state_rgb': False,
+                    'num_frames': 4,
+                    'state_offset': 1,
+                    'start_game_action_required': True,
+                    'start_game_action': 0,
+                },
+                'train': {
+                    'max_steps': 1000000,
+                    'max_episode_steps': 2000,
+                    'eval_frequency': 20000,
+                    'eval_steps': 3000,
+                    'epsilon': 0.995,
+                    'human_flag': False,
+                    'learning_rate': 0.0001,
+                    'tau': 0.001,
+                    'gamma': 0.99,
+                    'neural_network': [256, 128, 64, 64]
+                }
+            },
+        }
 
         return config
 

@@ -84,8 +84,8 @@ class Trainer:
 
         if (model_filename is not None):
             filename = self.select_model_filename(model_filename=model_filename)
-            agent.qnetwork_local.load_state_dict(torch.load(filename, map_location=lambda storage, loc: storage))
-            agent.qnetwork_target.load_state_dict(torch.load(filename, map_location=lambda storage, loc: storage))
+            agent.current_model.load_state_dict(torch.load(filename, map_location=lambda storage, loc: storage))
+            agent.target_model.load_state_dict(torch.load(filename, map_location=lambda storage, loc: storage))
             eps = 0.78
 
         epoch_recorder = Recorder(
@@ -141,6 +141,8 @@ class Trainer:
                         terminal = False
 
                         state, new_life = env.reset()
+                        state = agent.pre_process(state)
+
                         score = 0
                         epoch_episode += 1
 
@@ -151,16 +153,18 @@ class Trainer:
                     action = agent.act(state, eps)
 
                     # if self.__config.get_current_env_is_atari_flag():
-                    if self.__config.get_current_agent_start_game_action_required():
+                    if self.__config.get_agent_start_game_action_required():
                         if new_life:
-                            action = self.__config.get_current_agent_start_game_action()
+                            action = self.__config.get_agent_start_game_action()
 
-                    action = action + self.__config.get_current_agent_state_offset()
+                    action = action + self.__config.get_agent_state_offset()
 
                     if is_human_flag:
                         env.render(mode='human')
 
                     next_state, reward, done, new_life = env.step(action)
+
+                    next_state = agent.pre_process(next_state)
 
                     # if self.__config.get_current_env_is_atari_flag():
                     #     if info['ale.lives'] > lives:
@@ -173,7 +177,7 @@ class Trainer:
                     #     else:
                     #         new_life = False
 
-                    action = action - self.__config.get_current_agent_state_offset()
+                    action = action - self.__config.get_agent_state_offset()
 
                     # if done:
                     #     reward += self.__config.get_current_env_terminate_reward()
@@ -250,6 +254,7 @@ class Trainer:
                         terminal = False
 
                         state, new_life = env.reset()
+                        state = agent.pre_process(state)
                         score = 0
                         epoch_val_episode += 1
 
@@ -260,16 +265,18 @@ class Trainer:
                     action = agent.act(state, eps)
 
                     # if self.__config.get_current_env_is_atari_flag():
-                    if self.__config.get_current_agent_start_game_action_required():
+                    if self.__config.get_agent_start_game_action_required():
                         if new_life:
-                            action = self.__config.get_current_agent_start_game_action()
+                            action = self.__config.get_agent_start_game_action()
 
-                    action = action + self.__config.get_current_agent_state_offset()
+                    action = action + self.__config.get_agent_state_offset()
 
                     if is_human_flag:
                         env.render(mode='human')
 
                     next_state, reward, done, new_life = env.step(action)
+
+                    next_state = agent.pre_process(next_state)
 
                     # if self.__config.get_current_env_is_atari_flag():
                     #     if info['ale.lives'] > lives:
@@ -283,7 +290,7 @@ class Trainer:
                     #         new_life = False
 
                     if done:
-                        reward += self.__config.get_current_env_terminate_reward()
+                        reward += self.__config.get_env_terminate_reward()
 
                     val_step += 1
 
@@ -318,7 +325,7 @@ class Trainer:
 
             model_filename = self.get_model_filename(epoch, np.mean(scores_window), np.mean(val_scores_window), eps )
 
-            torch.save(agent.qnetwork_local.state_dict(), model_filename)
+            torch.save(agent.current_model.state_dict(), model_filename)
 
             epoch += 1
 
@@ -344,8 +351,8 @@ class Trainer:
 
         if (model_filename is not None):
             filename = self.select_model_filename(model_filename=model_filename)
-            agent.qnetwork_local.load_state_dict(torch.load(filename, map_location=lambda storage, loc: storage))
-            agent.qnetwork_target.load_state_dict(torch.load(filename, map_location=lambda storage, loc: storage))
+            agent.current_model.load_state_dict(torch.load(filename, map_location=lambda storage, loc: storage))
+            agent.target_model.load_state_dict(torch.load(filename, map_location=lambda storage, loc: storage))
             eps = 0.78
 
         for i_episode in range(1, n_episodes + 1):
@@ -382,7 +389,7 @@ class Trainer:
             if i_episode % 100 == 0:
                 print('\nEpisode {}\tAverage Score: {:.2f}\tEpsilon: {:.2f}'.format(i_episode, np.mean(scores_window),
                                                                                     eps))
-                torch.save(agent.qnetwork_local.state_dict(), model_filename)
+                torch.save(agent.current_model.state_dict(), model_filename)
 
             if i_episode % 100 == 0:
                 plot_filename = self.get_plot_filename(i_episode, np.mean(scores_window), eps)
@@ -391,7 +398,7 @@ class Trainer:
             if np.mean(scores_window) >= terminate_soore:
                 print('\nEpisode {}\tAverage Score: {:.2f}\tEpsilon: {:.2f}'.format(i_episode - 100,
                                                                                     np.mean(scores_window), eps))
-                torch.save(agent.qnetwork_local.state_dict(), model_filename)
+                torch.save(agent.current_model.state_dict(), model_filename)
                 self.plot(scores)
                 break
 

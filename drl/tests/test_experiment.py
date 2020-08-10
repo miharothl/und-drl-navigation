@@ -26,7 +26,7 @@ class TestExperiment:
         for env in envs:
             experiment.set_env(env)
 
-            if config.get_current_env_type() != 'unity':
+            if config.get_env_type() != 'unity':
                 experiment.play_dummy(mode='rgb-array', model=None, num_episodes=3, num_steps=10)
 
     @pytest.mark.depends(name='test_train')
@@ -39,7 +39,7 @@ class TestExperiment:
         for env in envs:
             experiment.set_env(env)
 
-            if config.get_current_env_type() != 'unity':
+            if config.get_env_type() != 'unity':
                 max_steps = 128
                 max_episode_steps = 2
                 scores = experiment.train(max_steps=max_steps, eval_frequency=16, eval_steps=4,
@@ -57,7 +57,7 @@ class TestExperiment:
         for env in envs:
             experiment.set_env(env)
 
-            if config.get_current_env_type() == 'unity':
+            if config.get_env_type() == 'unity':
                 max_steps = 128
                 max_episode_steps = 2
                 scores = experiment.train(max_steps=max_steps, eval_frequency=16, eval_steps=4,

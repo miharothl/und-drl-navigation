@@ -40,7 +40,7 @@ class Player:
                             model=None)
 
         if trained or (model_filename is not None):
-            self.__agent.qnetwork_local.load_state_dict(torch.load(model_filename, map_location=lambda storage, loc: storage))
+            self.__agent.current_model.load_state_dict(torch.load(model_filename, map_location=lambda storage, loc: storage))
 
         for i in range(num_episodes):
             scores = []
@@ -49,7 +49,7 @@ class Player:
             state, new_life = self.__env.reset()
             self.__env.render(mode=mode)
 
-            if self.__config.get_current_env_is_atari_flag():
+            if self.__config.get_env_is_atari_flag():
                 lives = -1
                 new_life = False
 
@@ -60,16 +60,16 @@ class Player:
                     else:
                         action = self.__agent.act(state, eps=1.)
 
-                    if self.__config.get_current_env_is_atari_flag():
-                        if self.__config.get_current_agent_start_game_action_required():
+                    if self.__config.get_env_is_atari_flag():
+                        if self.__config.get_agent_start_game_action_required():
                             if new_life:
-                                action = self.__config.get_current_agent_start_game_action()
+                                action = self.__config.get_agent_start_game_action()
 
                     self.__env.render(mode=mode)
 
                     state, reward, done, info = self.__env.step(action)
 
-                    if self.__config.get_current_env_is_atari_flag():
+                    if self.__config.get_env_is_atari_flag():
                         if info['ale.lives'] > lives:
                             lives = info['ale.lives']
                             new_life = True
@@ -114,7 +114,7 @@ class Player:
 
         if trained or (model_filename is not None):
             filename = self.select_model_filename(score_max, score_med, model_filename=model_filename)
-            self.__agent.qnetwork_local.load_state_dict(torch.load(filename, map_location=lambda storage, loc: storage))
+            self.__agent.current_model.load_state_dict(torch.load(filename, map_location=lambda storage, loc: storage))
 
         for i in range(num_episodes):
             scores = []
@@ -153,7 +153,7 @@ class Player:
 
         filename = self.select_model_filename(score_max, score_med)
 
-        self.__agent.qnetwork_local.load_state_dict(torch.load(filename))
+        self.__agent.current_model.load_state_dict(torch.load(filename))
 
         # from pyvirtualdisplay import Display
         # display = Display(visible=0, size=(1400, 900))
@@ -181,7 +181,6 @@ class Player:
 
         # display.stop()
 
-
     def play_classic_banana( self, num_episodes=3, score_max=True, score_med=False, trained=True, mode='rgb_array', model_filename=None, num_steps=None):
 
         recorder = Recorder(header=['episode', 'step', 'action', 'reward', 'reward_total'],
@@ -190,7 +189,7 @@ class Player:
                             model=None)
 
         if trained or (model_filename is not None):
-            self.__agent.qnetwork_local.load_state_dict(torch.load(model_filename, map_location=lambda storage, loc: storage))
+            self.__agent.current_model.load_state_dict(torch.load(model_filename, map_location=lambda storage, loc: storage))
 
         for i in range(num_episodes):
             scores = []

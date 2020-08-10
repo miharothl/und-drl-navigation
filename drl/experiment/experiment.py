@@ -22,7 +22,6 @@ class Experiment:
 
     def play(self, mode, model, num_episodes=3, trained=True, num_steps=None):
 
-
         with Player(model_id=self.__config.get_current_model_id(),
                         env=self.create_env(),
                         agent=self.create_agent(),
@@ -31,7 +30,7 @@ class Experiment:
 
             player.play(trained=trained,
                         mode=mode,
-                        is_rgb=self.__config.get_current_agent_state_rgb_flag(),
+                        is_rgb=self.__config.get_agent_state_rgb_flag(),
                         model_filename=model,
                         num_episodes=num_episodes,
                         num_steps=num_steps)
@@ -57,7 +56,7 @@ class Experiment:
 
         return trainer.train(self.create_agent(),
                              self.create_env(),
-                             self.__config.get_current_agent_state_rgb_flag(),
+                             self.__config.get_agent_state_rgb_flag(),
                              model_filename=model,
                              max_steps=max_steps,
                              max_episode_steps=max_episode_steps,
@@ -71,63 +70,40 @@ class Experiment:
         self.__config.set_current_env(env)
 
     def create_agent(self):
-        action_size = self.__config.get_current_agent_action_size()
-        state_size = self.__config.get_current_agent_state_size()
-        state_rgb = self.__config.get_current_agent_state_rgb_flag()
-        num_frames = self.__config.get_current_agent_number_frames_flag()
+        action_size = self.__config.get_agent_action_size()
+        state_size = self.__config.get_agent_state_size()
+        state_rgb = self.__config.get_agent_state_rgb_flag()
+        num_frames = self.__config.get_agent_num_frames()
 
         logging.debug("Agent action size: {}".format(action_size))
         logging.debug("Agent state size: {}".format(state_size))
         logging.debug("Agent state RGB: {}".format(state_rgb))
 
         if state_rgb:
-            agent = DqnAgentRgb(state_size=state_size, action_size=action_size, seed=0, num_frames=num_frames)
+            agent = DqnAgentRgb(state_size=state_size, action_size=action_size, seed=None, num_frames=num_frames)
         else:
-            agent = DqnAgent(state_size=state_size, action_size=action_size, seed=0, num_frames=num_frames, config=self.__config)
+            agent = DqnAgent(seed=0, cfg=self.__config)
 
         return agent
 
     def create_env(self):
         environment = self.__config.get_current_model_id()
 
-        type = self.__config.get_current_env_type()
+        type = self.__config.get_env_type()
 
         if type == 'gym_standard':
             env = GymStandardEnv(name=environment,
-                                 termination_reward=self.__config.get_current_env_terminate_reward())
+                                 termination_reward=self.__config.get_env_terminate_reward())
         elif type == 'gym_atari':
             env = GymAtariEnv(name=environment,
-                              termination_reward=self.__config.get_current_env_terminate_reward())
+                              termination_reward=self.__config.get_env_terminate_reward())
         elif type == 'unity':
             env = UnityEnv(name=environment,
-                           termination_reward=self.__config.get_current_env_terminate_reward())
+                           termination_reward=self.__config.get_env_terminate_reward())
         else:
             raise Exception("Environment {} type not supported".format(environment))
 
         return env
-
-        #
-        #
-        # logging.debug('Environment: {}'.format(environment))
-        #
-        # if environment == 'banana':
-        #     env = UnityEnvironment(file_name="Banana.app")
-        #     # env = UnityEnvironment(file_name="Banana_Linux_NoVis/Banana.x86_64")
-        #     return env
-        # else:
-        #     env = gym.make(environment)
-        #     env.seed(0)
-        #
-        #     isDiscrete = isinstance(env.action_space, Discrete)
-        #
-        #     if isDiscrete:
-        #         num_action_space = env.action_space.n
-        #         logging.debug("Env action space is discrete")
-        #         logging.debug("Env action space: {}".format(num_action_space))
-        #
-        #     logging.debug("Env observation space: {}".format(env.observation_space))
-        #
-        #     return env
 
     def list_envs(self):
         envs = self.__config.get_envs()

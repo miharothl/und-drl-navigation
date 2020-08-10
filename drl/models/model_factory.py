@@ -3,8 +3,6 @@ from typing import Tuple
 
 from drl.models.classic.model import DqnDueling2Hidden, Dqn2Hidden, Dqn3Hidden, Dqn4Hidden
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
 
 class ModelFactory:
 
@@ -12,7 +10,7 @@ class ModelFactory:
         pass
 
     @staticmethod
-    def create(type, fc_units, num_frames, state_size, action_size, dueling, seed)\
+    def create(type, fc_units, num_frames, state_size, action_size, dueling, seed, device)\
             -> Tuple[torch.nn.Module, torch.nn.Module]:
 
         supported_types = ['classic', 'rgb']

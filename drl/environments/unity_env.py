@@ -29,7 +29,6 @@ class UnityEnv(Environment):
 
         return next_state, reward, done, new_life
 
-
     def render(self, mode):
         pass
 

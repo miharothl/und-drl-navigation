@@ -97,12 +97,12 @@ def main():
             print(path)
         elif args.train:
             environment.train(model=args.model_filename,
-                              max_steps=config.get_current_env_train_max_steps(),
-                              max_episode_steps=config.get_current_env_train_max_episodes_steps(),
-                              eval_steps=config.get_current_env_train_eval_steps(),
-                              eval_frequency=config.get_current_env_train_train_eval_frequency(),
-                              eps_decay=config.get_current_env_train_epsilon(),
-                              is_human_flag=config.get_current_env_train_is_human_flag())
+                              max_steps=config.get_train_max_steps(),
+                              max_episode_steps=config.get_train_max_episodes_steps(),
+                              eval_steps=config.get_train_eval_steps(),
+                              eval_frequency=config.get_train_train_eval_frequency(),
+                              eps_decay=config.get_train_epsilon(),
+                              is_human_flag=config.get_train_is_human_flag())
 
             # train.dqn_rgb(agent, env)
             # train.dqn_banana(agent, env)
