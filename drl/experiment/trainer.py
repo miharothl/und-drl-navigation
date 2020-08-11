@@ -42,29 +42,29 @@ class Trainer:
         if is_rgb:
             return self.dqn_rgb(agent, env, model_filename, n_episodes=max_steps, eval_steps=eval_steps)
         else:
-            return self.dqn_normal(agent, env, model_filename,
-                                   max_steps=max_steps,
-                                   max_episode_steps=max_episode_steps,
-                                   eval_frequency=eval_frequency,
-                                   eval_steps=eval_steps,
-                                   eps_decay=eps_decay,
-                                   is_human_flag=is_human_flag
-                                   )
+            return self.dqn_classic(agent, env, model_filename,
+                                    max_steps=max_steps,
+                                    max_episode_steps=max_episode_steps,
+                                    eval_frequency=eval_frequency,
+                                    eval_steps=eval_steps,
+                                    eps_decay=eps_decay,
+                                    is_human_flag=is_human_flag
+                                    )
 
     def select_model_filename(self, model_filename=None):
         if model_filename is not None:
             path = os.path.join(self.__path_models, model_filename)
             return path
 
-    def dqn_normal(self, agent, env, model_filename=None,
-                   max_steps=300000000,
-                   max_episode_steps=18000,
-                   eval_frequency=2000,
-                   eval_steps=10000,
-                   is_human_flag=False,
-                   eps_start=1.0,
-                   eps_end=0.01,
-                   eps_decay=0.9990, terminate_soore=800.0):
+    def dqn_classic(self, agent, env, model_filename=None,
+                    max_steps=300000000,
+                    max_episode_steps=18000,
+                    eval_frequency=2000,
+                    eval_steps=10000,
+                    is_human_flag=False,
+                    eps_start=1.0,
+                    eps_end=0.01,
+                    eps_decay=0.9990, terminate_soore=800.0):
         """Deep Q-Learning.
 
         Params
@@ -82,6 +82,7 @@ class Trainer:
         pos_reward_ratio_window = deque(maxlen=100)
         neg_reward_ratio_window = deque(maxlen=100)
 
+        # start with pre-trained model
         if (model_filename is not None):
             filename = self.select_model_filename(model_filename=model_filename)
             agent.current_model.load_state_dict(torch.load(filename, map_location=lambda storage, loc: storage))
@@ -137,7 +138,6 @@ class Trainer:
                         break
 
                     if terminal:
-
                         terminal = False
 
                         state, new_life = env.reset()
@@ -146,13 +146,8 @@ class Trainer:
                         score = 0
                         epoch_episode += 1
 
-                        # if self.__config.get_current_env_is_atari_flag():
-                        #     lives = -1
-                        #     new_life = False
-
                     action = agent.act(state, eps)
 
-                    # if self.__config.get_current_env_is_atari_flag():
                     if self.__config.get_agent_start_game_action_required():
                         if new_life:
                             action = self.__config.get_agent_start_game_action()
@@ -166,21 +161,11 @@ class Trainer:
 
                     next_state = agent.pre_process(next_state)
 
-                    # if self.__config.get_current_env_is_atari_flag():
-                    #     if info['ale.lives'] > lives:
-                    #         lives = info['ale.lives']
-                    #         new_life = True
-                    #     elif info['ale.lives'] < lives:
-                    #         lives = info['ale.lives']
-                    #         new_life = True
-                    #         reward = reward - 1
-                    #     else:
-                    #         new_life = False
-
                     action = action - self.__config.get_agent_state_offset()
 
-                    # if done:
-                    #     reward += self.__config.get_current_env_terminate_reward()
+                    if done:
+                        reward += self.__config.get_env_terminate_reward()
+
 
                     pos_reward_ratio, neg_reward_ratio, loss, beta = agent.step(state, action, reward, next_state, done)
 
@@ -258,13 +243,8 @@ class Trainer:
                         score = 0
                         epoch_val_episode += 1
 
-                        # if self.__config.get_current_env_is_atari_flag():
-                        #     lives = -1
-                        #     new_life = False
-
                     action = agent.act(state, eps)
 
-                    # if self.__config.get_current_env_is_atari_flag():
                     if self.__config.get_agent_start_game_action_required():
                         if new_life:
                             action = self.__config.get_agent_start_game_action()
@@ -277,17 +257,6 @@ class Trainer:
                     next_state, reward, done, new_life = env.step(action)
 
                     next_state = agent.pre_process(next_state)
-
-                    # if self.__config.get_current_env_is_atari_flag():
-                    #     if info['ale.lives'] > lives:
-                    #         lives = info['ale.lives']
-                    #         new_life = True
-                    #     elif info['ale.lives'] < lives:
-                    #         lives = info['ale.lives']
-                    #         new_life = True
-                    #         reward = reward - 1
-                    #     else:
-                    #         new_life = False
 
                     if done:
                         reward += self.__config.get_env_terminate_reward()
@@ -403,72 +372,3 @@ class Trainer:
                 break
 
         return scores
-
-    # def dqn_banana(self, agent, env, n_episodes=3000, max_t=1000, eps_start=1.0, eps_end=0.01, eps_decay=0.995,
-    #                terminate_soore=300.0):
-    #     """Deep Q-Learning.
-    #
-    #     Params
-    #     ======
-    #         n_episodes (int): maximum number of training episodes
-    #         max_t (int): maximum number of timesteps per episode
-    #         eps_start (float): starting value of epsilon, for epsilon-greedy action selection
-    #         eps_end (float): minimum value of epsilon
-    #         eps_decay (float): multiplicative factor (per episode) for decreasing epsilon
-    #     """
-    #
-    #     brain_name = env.brain_names[0]
-    #     brain = env.brains[brain_name]
-    #
-    #     scores = []  # list containing scores from each episode
-    #     scores_window = deque(maxlen=100)  # last 100 scores
-    #     eps = eps_start  # initialize epsilon
-    #     for i_episode in range(1, n_episodes + 1):
-    #
-    #         # reset the environment
-    #         env_info = env.reset(train_mode=True)[brain_name]
-    #         state = env_info.vector_observations[0]  # get the current state
-    #         score = 0
-    #
-    #         for t in range(max_t):
-    #
-    #             action = agent.act(state, eps)
-    #
-    #             env_info = env.step(action)[brain_name]  # send the action to the environment
-    #
-    #             next_state = env_info.vector_observations[0]  # get the next state
-    #             reward = env_info.rewards[0]  # get the reward
-    #             done = env_info.local_done[0]  # see if episode has finished
-    #
-    #             agent.step(state, action, reward, next_state, done)
-    #
-    #             state = next_state
-    #             score += reward
-    #             if done:
-    #                 print('done')
-    #                 break
-    #         scores_window.append(score)  # save most recent score
-    #         scores.append(score)  # save most recent score
-    #
-    #         eps = max(eps_end, eps_decay * eps)  # decrease epsilon
-    #
-    #         model_filename = self.get_model_filename(i_episode, np.mean(scores_window), eps)
-    #
-    #         print('\rEpisode {}\tAverage Score: {:.2f}\tEpsilon: {:.2f}'.format(i_episode, np.mean(scores_window), eps),
-    #               end="")
-    #         if i_episode % 100 == 0:
-    #             print('\rEpisode {}\tAverage Score: {:.2f}\tEpsilon: {:.2f}'.format(i_episode, np.mean(scores_window),
-    #                                                                                 eps))
-    #             torch.save(agent.qnetwork_local.state_dict(), model_filename)
-    #
-    #         if i_episode % 500 == 0:
-    #             self.plot(scores)
-    #
-    #         if np.mean(scores_window) >= terminate_soore:
-    #             print('\nEpisode {}\tAverage Score: {:.2f}\tEpsilon: {:.2f}'.format(i_episode - 100,
-    #                                                                                 np.mean(scores_window), eps))
-    #             torch.save(agent.qnetwork_local.state_dict(), model_filename)
-    #             self.plot(scores)
-    #             break
-    #
-    #     return scores

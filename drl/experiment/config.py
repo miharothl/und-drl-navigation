@@ -235,8 +235,8 @@ class Config:
                     },
                     'neural_network': {
                         'hidden_layers': [64, 64],
-                        'dueling': False,
-                        'double': True,
+                        'dueling': True,
+                        'double': False,
                     },
                     'replay_memory': {
                         'buffer_size': 100000,
