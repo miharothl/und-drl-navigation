@@ -40,7 +40,7 @@ To set up your python environment to run the code in this repository, follow the
 	
 3. Clone the repository (if you haven't already!), and navigate to the `env/python/` folder.  Then, install several dependencies.
 ```bash
-git clone https://github.com/miharothl/lab-drlnd-navigation.git
+git clone https://github.com/miharothl/DRLND-Navigation.git
 cd lab-drlnd-navigation/env/python
 pip install .
 ```
