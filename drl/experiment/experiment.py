@@ -15,6 +15,7 @@ from drl.experiment.config import Config
 from drl.experiment.player import Player
 from drl.experiment.trainer import Trainer
 
+
 class Experiment:
     def __init__(self, config: Config):
         self.__config = config
@@ -23,17 +24,16 @@ class Experiment:
     def play(self, mode, model, num_episodes=3, trained=True, num_steps=None):
 
         with Player(model_id=self.__config.get_current_model_id(),
-                        env=self.create_env(),
-                        agent=self.create_agent(),
-                        config=self.__config,
-                        session_id=self.get_session_id()) as player:
-
+                    env=self.create_env(),
+                    agent=self.create_agent(),
+                    config=self.__config,
+                    session_id=self.get_session_id()) as player:
             return player.play(trained=trained,
-                        mode=mode,
-                        is_rgb=self.__config.get_agent_state_rgb_flag(),
-                        model_filename=model,
-                        num_episodes=num_episodes,
-                        num_steps=num_steps)
+                               mode=mode,
+                               is_rgb=self.__config.get_agent_state_rgb_flag(),
+                               model_filename=model,
+                               num_episodes=num_episodes,
+                               num_steps=num_steps)
 
     def play_dummy(self, mode, model, num_episodes=3, num_steps=None):
         self.play(trained=False,
@@ -42,7 +42,7 @@ class Experiment:
                   num_episodes=num_episodes,
                   num_steps=num_steps)
 
-    def train(self, model=None):
+    def train(self, model=None, max_steps=None, eval_frequency=None, eval_steps=None, max_episode_steps=None):
 
         trainer = Trainer(
             config=self.__config,
@@ -50,11 +50,20 @@ class Experiment:
             model_id=self.__config.get_current_model_id()
         )
 
-        max_steps = self.__config.get_train_max_steps()
-        max_episode_steps = self.__config.get_train_max_episodes_steps()
-        eval_steps = self.__config.get_train_eval_steps()
-        eval_frequency = self.__config.get_train_train_eval_frequency()
+        if max_steps is None:
+            max_steps = self.__config.get_train_max_steps()
+
+        if max_episode_steps is None:
+            max_episode_steps = self.__config.get_train_max_episodes_steps()
+
+        if eval_steps is None:
+            eval_steps = self.__config.get_train_eval_steps()
+
+        if eval_frequency is None:
+            eval_frequency = self.__config.get_train_train_eval_frequency()
+
         eps_decay = self.__config.get_train_epsilon()
+
         is_human_flag = self.__config.get_train_is_human_flag()
 
         return trainer.train(self.create_agent(),

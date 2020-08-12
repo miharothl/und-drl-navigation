@@ -183,20 +183,20 @@ class Trainer:
                     if done:
                         break
 
-                #     logging.debug(
-                #         'Step: {}\tEpisode: {}\tEpoch: {}\tEpoch Step: {}\tEpoch Episode: {}\tEpisode Step: {}\tScore: {:.2f}'
-                #         '\tEpsilon: {:.2f}\tAvg Pos Reward Ratio: {:.3f}\tAvg Neg Reward Ratio: {:.3f}\tLoss {:.6f}'
-                #             .format(step, episode, epoch, epoch_step, epoch_episode, episode_step, score, eps,
-                #                     np.mean(pos_reward_ratio_window) if len(pos_reward_ratio_window) > 0 else 0,
-                #                     np.mean(neg_reward_ratio_window) if len(neg_reward_ratio_window) > 0 else 0,
-                #                     np.mean(loss_window) if len(loss_window) > 0 else 0))
-                # logging.warning(
-                #     'Step: {}\tEpisode: {}\tEpoch: {}\tEpoch Step: {}\tEpoch Episode: {}\tEpisode Step: {}\tScore: {:.2f}'
-                #     '\tEpsilon: {:.2f}\tAvg Pos Reward Ratio: {:.3f}\tAvg Neg Reward Ratio: {:.3f}\tLoss {:.6f}'
-                #         .format(step, episode, epoch, epoch_step, epoch_episode, episode_step, score, eps,
-                #                 np.mean(pos_reward_ratio_window) if len(pos_reward_ratio_window) > 0 else 0,
-                #                 np.mean(neg_reward_ratio_window) if len(neg_reward_ratio_window) > 0 else 0,
-                #                 np.mean(loss_window) if len(loss_window) > 0 else 0))
+                    logging.debug(
+                        'Step: {}\tEpisode: {}\tEpoch: {}\tEpoch Step: {}\tEpoch Episode: {}\tEpisode Step: {}\tScore: {:.2f}'
+                        '\tEpsilon: {:.2f}\tAvg Pos Reward Ratio: {:.3f}\tAvg Neg Reward Ratio: {:.3f}\tLoss {:.6f}'
+                            .format(step, episode, epoch, epoch_step, epoch_episode, episode_step, score, eps,
+                                    np.mean(pos_reward_ratio_window) if len(pos_reward_ratio_window) > 0 else 0,
+                                    np.mean(neg_reward_ratio_window) if len(neg_reward_ratio_window) > 0 else 0,
+                                    np.mean(loss_window) if len(loss_window) > 0 else 0))
+                logging.warning(
+                    'Step: {}\tEpisode: {}\tEpoch: {}\tEpoch Step: {}\tEpoch Episode: {}\tEpisode Step: {}\tScore: {:.2f}'
+                    '\tEpsilon: {:.2f}\tAvg Pos Reward Ratio: {:.3f}\tAvg Neg Reward Ratio: {:.3f}\tLoss {:.6f}'
+                        .format(step, episode, epoch, epoch_step, epoch_episode, episode_step, score, eps,
+                                np.mean(pos_reward_ratio_window) if len(pos_reward_ratio_window) > 0 else 0,
+                                np.mean(neg_reward_ratio_window) if len(neg_reward_ratio_window) > 0 else 0,
+                                np.mean(loss_window) if len(loss_window) > 0 else 0))
 
                 episode_recorder.record([step, episode, epoch, epoch_step, epoch_episode, episode_step, score, eps, beta,
                                          np.mean(pos_reward_ratio_window) if len(pos_reward_ratio_window) > 0 else 0,
@@ -270,13 +270,13 @@ class Trainer:
                     if done:
                         break
 
-                #     logging.debug(
-                #         'Epoch: {}\tVal Step: {}\tEpoch Val Episode: {}\tEpisode Step: {}\tVal Score: {:.2f}\tEpsilon: {:.2f}'
-                #             .format(epoch, val_step, epoch_val_episode, episode_val_step, score, eps))
-                #
-                # logging.warning(
-                #     'Epoch: {}\tVal Step: {}\tEpoch Val Episode: {}\tEpisode Step: {}\tVal Score: {:.2f}\tEpsilon: {:.2f}'
-                #         .format(epoch, val_step, epoch_val_episode, episode_val_step, score, eps))
+                    logging.debug(
+                        'Epoch: {}\tVal Step: {}\tEpoch Val Episode: {}\tEpisode Step: {}\tVal Score: {:.2f}\tEpsilon: {:.2f}'
+                            .format(epoch, val_step, epoch_val_episode, episode_val_step, score, eps))
+
+                logging.warning(
+                    'Epoch: {}\tVal Step: {}\tEpoch Val Episode: {}\tEpisode Step: {}\tVal Score: {:.2f}\tEpsilon: {:.2f}'
+                        .format(epoch, val_step, epoch_val_episode, episode_val_step, score, eps))
 
                 if val_step < EVAL_STEPS:
                     val_scores_window.append(score)  # save most recent score

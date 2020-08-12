@@ -171,7 +171,7 @@ class Config:
                         'state_size': 8,
                         'discrete': True,
                         'state_rgb': False,
-                        'num_frames': 4,
+                        'num_frames': 1,
                         'state_offset': 0,
                         'start_game_action_required': False,
                         'start_game_action': 0,
@@ -192,7 +192,7 @@ class Config:
                     'neural_network': {
                         'hidden_layers': [64, 64],
                         'dueling': False,
-                        'double': True,
+                        'double': False,
                     },
                     'replay_memory': {
                         'buffer_size': 100000,

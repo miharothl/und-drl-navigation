@@ -22,7 +22,7 @@ class GymStandardEnv(Environment):
 
         return next_state, reward, done, new_life
 
-    def reset(self):
+    def reset(self, train_mode=False):
 
         new_life = True
         return self.__env.reset(), new_life

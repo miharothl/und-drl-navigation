@@ -34,7 +34,7 @@ class GymAtariEnv(Environment):
 
         return next_state, reward, done, self.__new_life
 
-    def reset(self):
+    def reset(self, train_mode=False):
         self.__lives = -1
         self.__new_life = True
 
