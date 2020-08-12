@@ -53,10 +53,6 @@ def parse_arguments(params):
                     action='store',
                     help="Analyse train experiments")
 
-    #                 default='score_max',
-    #                 choices=['score_max', 'score_min', 'score_median', 'random'],
-    #                 help="Model selection criteria")
-
     args = ap.parse_args()
 
     return args
@@ -77,9 +73,6 @@ def main():
         config = Config()
         config.set_current_env(args.env)
         environment = Experiment(config)
-        # environment.set_env(args.env)
-        # agent = environment.create_agent()
-        # env = environment.create_env()
         explorer = Explorer(config)
         analyzer = Analyzer(config, environment.get_session_id())
 
@@ -96,18 +89,8 @@ def main():
             path = analyzer.compare_train_epoch_cols(args.exps, args.analyse_compare_epoch_cols)
             print(path)
         elif args.train:
-            environment.train(model=args.model_filename,
-                              max_steps=config.get_train_max_steps(),
-                              max_episode_steps=config.get_train_max_episodes_steps(),
-                              eval_steps=config.get_train_eval_steps(),
-                              eval_frequency=config.get_train_train_eval_frequency(),
-                              eps_decay=config.get_train_epsilon(),
-                              is_human_flag=config.get_train_is_human_flag())
-
-            # train.dqn_rgb(agent, env)
-            # train.dqn_banana(agent, env)
+            environment.train(model=args.model_filename)
         elif args.play:
-
             if args.model_filename is not None:
                 environment.play(
                     mode='human',
@@ -120,8 +103,6 @@ def main():
                     model=None,
                     num_episodes=args.play_episodes
                 )
-
-        # env.close()
 
     except Exception as e:
         logging.exception("Something went wrong :-(")

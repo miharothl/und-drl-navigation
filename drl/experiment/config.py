@@ -171,7 +171,7 @@ class Config:
                         'state_size': 8,
                         'discrete': True,
                         'state_rgb': False,
-                        'num_frames': 1,
+                        'num_frames': 4,
                         'state_offset': 0,
                         'start_game_action_required': False,
                         'start_game_action': 0,
@@ -191,8 +191,8 @@ class Config:
                     },
                     'neural_network': {
                         'hidden_layers': [64, 64],
-                        'dueling': True,
-                        'double': False,
+                        'dueling': False,
+                        'double': True,
                     },
                     'replay_memory': {
                         'buffer_size': 100000,
@@ -222,7 +222,7 @@ class Config:
                     },
                     'train': {
                         'max_steps': 600000,
-                        'max_episode_steps': 1000,
+                        'max_episode_steps': 300,
                         'eval_frequency': 10200,
                         'eval_steps': 2100,
                         'epsilon': 0.995,
@@ -235,8 +235,8 @@ class Config:
                     },
                     'neural_network': {
                         'hidden_layers': [64, 64],
-                        'dueling': True,
-                        'double': False,
+                        'dueling': False,
+                        'double': True,
                     },
                     'replay_memory': {
                         'buffer_size': 100000,

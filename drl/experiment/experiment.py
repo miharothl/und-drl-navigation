@@ -28,7 +28,7 @@ class Experiment:
                         config=self.__config,
                         session_id=self.get_session_id()) as player:
 
-            player.play(trained=trained,
+            return player.play(trained=trained,
                         mode=mode,
                         is_rgb=self.__config.get_agent_state_rgb_flag(),
                         model_filename=model,
@@ -42,17 +42,20 @@ class Experiment:
                   num_episodes=num_episodes,
                   num_steps=num_steps)
 
-    def train(self, model=None,
-              max_steps=10000,
-              max_episode_steps=18000,
-              eval_frequency=10000,
-              eval_steps=10000,
-              eps_decay=0.99,
-              is_human_flag=False):
+    def train(self, model=None):
+
         trainer = Trainer(
             config=self.__config,
             session_id=self.get_session_id(),
-            model_id=self.__config.get_current_model_id())
+            model_id=self.__config.get_current_model_id()
+        )
+
+        max_steps = self.__config.get_train_max_steps()
+        max_episode_steps = self.__config.get_train_max_episodes_steps()
+        eval_steps = self.__config.get_train_eval_steps()
+        eval_frequency = self.__config.get_train_train_eval_frequency()
+        eps_decay = self.__config.get_train_epsilon()
+        is_human_flag = self.__config.get_train_is_human_flag()
 
         return trainer.train(self.create_agent(),
                              self.create_env(),

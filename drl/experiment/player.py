@@ -25,14 +25,14 @@ class Player:
     def play(self, trained, mode, is_rgb, model_filename, num_episodes, num_steps):
 
         if is_rgb:
-             return self.play_rgb(num_episodes=num_episodes, num_steps=num_steps, trained=trained, mode=mode, model_filename=model_filename)
+            return self.play_rgb(num_episodes=num_episodes, num_steps=num_steps, trained=trained, mode=mode,
+                                 model_filename=model_filename)
         else:
-            # if self.__config.get_current_env() == 'banana':
-            #     return self.play_classic_banana(num_episodes=num_episodes, num_steps=num_steps, trained=trained, mode=mode, model_filename=model_filename)
-            # else:
-            return self.play_classic(num_episodes=num_episodes, num_steps=num_steps, trained=trained, mode=mode, model_filename=model_filename)
+            return self.play_classic(num_episodes=num_episodes, num_steps=num_steps, trained=trained, mode=mode,
+                                     model_filename=model_filename)
 
-    def play_classic( self, num_episodes=3, score_max=True, score_med=False, trained=True, mode='rgb_array', model_filename=None, num_steps=None):
+    def play_classic(self, num_episodes=3, score_max=True, score_med=False, trained=True, mode='rgb_array',
+                     model_filename=None, num_steps=None):
 
         recorder = Recorder(header=['episode', 'step', 'action', 'reward', 'reward_total'],
                             session_id=self.__session_id,
@@ -40,13 +40,21 @@ class Player:
                             model=None)
 
         if trained or (model_filename is not None):
-            self.__agent.current_model.load_state_dict(torch.load(model_filename, map_location=lambda storage, loc: storage))
+            self.__agent.current_model.load_state_dict(
+                torch.load(model_filename, map_location=lambda storage, loc: storage))
 
+        if mode == "human":
+            train_mode = False
+        else:
+            train_mode = True
+
+        scores = []
         for i in range(num_episodes):
-            scores = []
             reward_total = 0
             step = 0
-            state, new_life = self.__env.reset()
+            state, new_life = self.__env.reset(train_mode=train_mode)
+            state = self.__agent.pre_process(state)
+
             self.__env.render(mode=mode)
 
             if self.__config.get_env_is_atari_flag():
@@ -68,6 +76,8 @@ class Player:
                     self.__env.render(mode=mode)
 
                     state, reward, done, info = self.__env.step(action)
+
+                    state = self.__agent.pre_process(state)
 
                     if self.__config.get_env_is_atari_flag():
                         if info['ale.lives'] > lives:
@@ -104,84 +114,20 @@ class Player:
                     if done:
                         break
 
-            scores.append([[i, reward_total, step]])
+            scores.append([i, reward_total, step])
 
             recorder.save()
 
-        return scores
+        import numpy as np
 
-    def play_rgb(self, num_episodes=3, score_max=True, score_med=False, trained=True, mode='rgb_array', model_filename=None, num_steps=None):
+        np_scr = np.array(scores)
 
-        if trained or (model_filename is not None):
-            filename = self.select_model_filename(score_max, score_med, model_filename=model_filename)
-            self.__agent.current_model.load_state_dict(torch.load(filename, map_location=lambda storage, loc: storage))
+        mean = np_scr[:, 1].mean()
 
-        for i in range(num_episodes):
-            scores = []
-            reward_total = 0
-            steps_total = 0
-            state, new_life = self.__env.reset()
-            image = self.__env.render(mode=mode)
+        return scores, mean
 
-            image2 = imshow(state)
-
-            if num_steps is None:
-                while True:
-                    action = self.__agent.act(image2)
-                    self.__env.render(mode=mode)
-                    state, reward, done, _ = self.__env.step(action)
-                    reward_total += reward
-                    steps_total += 1
-
-                    if done:
-                        break
-            else:
-                for j in range(num_steps):
-                    action = self.__agent.act(image2)
-                    self.__env.render(mode=mode)
-                    state, reward, done, _ = self.__env.step(action)
-                    reward_total += reward
-                    steps_total += j
-
-                    if done:
-                        break
-            scores.append([[i, reward_total, steps_total]])
-
-        return scores
-
-    def play_plot(self, score_max=True, score_med=False):
-
-        filename = self.select_model_filename(score_max, score_med)
-
-        self.__agent.current_model.load_state_dict(torch.load(filename))
-
-        # from pyvirtualdisplay import Display
-        # display = Display(visible=0, size=(1400, 900))
-        # display.start()
-
-        # is_ipython = 'inline' in plt.get_backend()
-        # if is_ipython:
-        #     from IPython import display
-        #
-
-        from IPython import display
-
-        for i in range(1):
-            state, new_life = self.__env.reset()
-            img = plt.imshow(self.__env.render(mode='rgb_array'))
-            for j in range(200):
-                action = self.__agent.act(state)
-                img.set_data(self.__env.render(mode='rgb_array'))
-                plt.axis('off')
-                display.display(plt.gcf())
-                display.clear_output(wait=True)
-                state, reward, done, _ = self.__env.step(action)
-                if done:
-                    break
-
-        # display.stop()
-
-    def play_classic_banana( self, num_episodes=3, score_max=True, score_med=False, trained=True, mode='rgb_array', model_filename=None, num_steps=None):
+    def play_classic_banana(self, num_episodes=3, score_max=True, score_med=False, trained=True, mode='rgb_array',
+                            model_filename=None, num_steps=None):
 
         recorder = Recorder(header=['episode', 'step', 'action', 'reward', 'reward_total'],
                             session_id=self.__session_id,
@@ -189,7 +135,8 @@ class Player:
                             model=None)
 
         if trained or (model_filename is not None):
-            self.__agent.current_model.load_state_dict(torch.load(model_filename, map_location=lambda storage, loc: storage))
+            self.__agent.current_model.load_state_dict(
+                torch.load(model_filename, map_location=lambda storage, loc: storage))
 
         for i in range(num_episodes):
             scores = []
@@ -263,14 +210,11 @@ class Player:
 
         return scores
 
-
-
     def play_banana(self, score_max=True, score_med=False):
 
         filename = self.select_model_filename(score_max, score_med)
 
         self.__agent.qnetwork_local.load_state_dict(torch.load(filename))
-
 
         brain_name = self.__env.brain_names[0]
         brain = self.__env.brains[brain_name]
@@ -307,4 +251,3 @@ class Player:
                 break
 
         print("Score: {}".format(score))
-
