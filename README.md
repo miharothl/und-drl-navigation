@@ -3,7 +3,7 @@
 [image1]: https://user-images.githubusercontent.com/10624937/42135619-d90f2f28-7d12-11e8-8823-82b970a54d7e.gif "Trained Agent"
 [image2]: https://user-images.githubusercontent.com/10624937/42386929-76f671f0-8106-11e8-9376-f17da2ae852e.png "Kernel"
 
-# Deep Reinforcement Learning - Udacity - Project 1: Navigation
+# Deep Reinforcement Learning - Project Navigation
 
 The goal of the project is to train an agent to navigate and collect bananas in a large world.
 
@@ -70,48 +70,23 @@ List of supported environments
 ```
 ./rlab -l
 ```
+To train banana environment
+```
+./rlab -e banana -t -vvv
+```
+To play banana environment with a dummy agent
+```
+./rlab -vvv -e banana -p
+```
+To play banana environment with a trained agent
+```
+./rlab -vvv -e banana -p -f _experiments/train/banana-20200812T0605/banana_banana-20200812T0605_58_16.52_16.33_0.01.pth
+```
 
 # Development
 
-List of make targets
-```
-make
-```
-
 To run tests
 ```
-make test
+make clean && make test
 ```
 
-To clean tests output
-```
-make clean 
-```
-
-
-
-
-
-
-
-```
-conda create --name drlnd python=3.6
-source activate drlnd
-
-cd env/python
-
-pip install .
-
-python -m ipykernel install --user --name drlnd --display-name "drlnd"
-
-install gym
-git clone https://github.com/openai/gym.git
-cd gym
-pip install -e .
-
-dev env
-pip install pytest-depends
-pip install opencv-python
-
-rlab -h
-```

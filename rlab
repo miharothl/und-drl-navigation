@@ -11,7 +11,7 @@ import logging
 import logging.config
 
 def parse_arguments(params):
-    ap = argparse.ArgumentParser(description="Runs data prep",
+    ap = argparse.ArgumentParser(description="Runs deep reinforcement learning experiments",
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     ap.add_argument("-v", "--verbose", dest="verbose_count",
                     action="count", default=0,
