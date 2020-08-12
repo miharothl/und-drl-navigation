@@ -15,10 +15,10 @@ The state space has 37 dimensions and contains the agent's velocity, along with 
 agent's forward direction. Given this information, the agent has to learn how to best select actions. 
 Four discrete actions are available, corresponding to:
 
-* move forward.
-* move backward.
-* turn left.
-* turn right.
+* move forward
+* move backward
+* turn left
+* turn right
 
 The task is episodic, and in order to solve the environment, agent must get an average score of +13 over 100
 consecutive episodes.
