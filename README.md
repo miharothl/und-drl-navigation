@@ -5,7 +5,7 @@
 
 # Deep Reinforcement Learning - Udacity - Project 1: Navigation
 
-the goal of the project is to train an agent to navigate and collect bananas in a large world.
+The goal of the project is to train an agent to navigate and collect bananas in a large world.
 
 ![Trained Agent][image1]
 
@@ -20,7 +20,7 @@ Four discrete actions are available, corresponding to:
 * turn left.
 * turn right.
 
-The task is episodic, and in order to solve the environment, your agent must get an average score of +13 over 100
+The task is episodic, and in order to solve the environment, agent must get an average score of +13 over 100
 consecutive episodes.
 
 ## Environment
@@ -53,6 +53,44 @@ python -m ipykernel install --user --name drlnd --display-name "drlnd"
 5. Before running code in a notebook, change the kernel to match the `drlnd` environment by using the drop-down `Kernel` menu. 
 
 ![Kernel][image2]
+
+6. Download the Unity environment from one of the links below.  You need only select the environment that matches your operating system:
+  - Linux: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana_Linux.zip)
+  - Mac OSX: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana.app.zip)
+  - Windows (32-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana_Windows_x86.zip)
+  - Windows (64-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana_Windows_x86_64.zip)
+    
+# How to Use Reinforcement Learning Lab
+
+To get get help 
+```
+./rlab -h
+```
+List of supported environments
+```
+./rlab -l
+```
+
+# Development
+
+List of make targets
+```
+make
+```
+
+To run tests
+```
+make test
+```
+
+To clean tests output
+```
+make clean 
+```
+
+
+
+
 
 
 
