@@ -59,14 +59,24 @@ python -m ipykernel install --user --name drlnd --display-name "drlnd"
   - Mac OSX: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana.app.zip)
   - Windows (32-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana_Windows_x86.zip)
   - Windows (64-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana_Windows_x86_64.zip)
+  
+If not Mac OSX copy environment into env/unity and update configuration `drl/experiment/config.py`
+
+```
+'banana':
+{
+    'id': 'env/unity/mac/banana',
+    'env': {
+...
+```
     
-# How to Use Reinforcement Learning Lab
+## How to Use Reinforcement Learning Lab
 
 To get get help 
 ```
 ./rlab -h
 ```
-List of supported environments
+To get list of supported environments
 ```
 ./rlab -l
 ```
