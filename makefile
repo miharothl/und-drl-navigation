@@ -4,14 +4,11 @@ test: ## run pytest
 clean: ## clean
 	rm -r _tests	
 
-
-
 train: ## train 
 	./train.sh &
 
 train-rgb: ## train-rgb
 	./train-rgb.sh &
-
 
 .PHONY: help
 
