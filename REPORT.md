@@ -136,8 +136,8 @@ and validation episodes using only trained agent. I used the following training 
 
 * Both Dueling and Double network perform better than vanilla DQN. There was no significant difference between the Dueling and the Double  Q network.
 * Less exploration (eps 0.98 vs. 0.95) didn't result in faster convergence of the optimization.
-* Using more neurons (64 vs. 128) in fully connected layers didn't increase the speed of convergence. After 2000 episodes, simpler networks achieved better scores (+1).
-* Using more frames (1 vs. 4) didn't improve the speed of convergence or and result of the agent.
+* Using more neurons (128 vs. 64) in fully connected layers didn't increase the speed of convergence. After 2000 episodes, simpler networks achieved better scores (+1).
+* Using more frames (4 vs. 1) didn't improve the speed of convergence or and result of the agent.
 * Prioritized experience replay didn't improve the results.
 
 The project is solved in epoch 32 after playing 1088 episodes. The trained agent achieves an average score of 16.51 over 100 episodes.
